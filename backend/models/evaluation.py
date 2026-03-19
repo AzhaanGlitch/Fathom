@@ -1,0 +1,81 @@
+from pydantic import BaseModel, Field
+from typing import List, Optional
+from datetime import datetime
+
+class ScoreDetail(BaseModel):
+    score: float  # 1-10
+    reason: str
+    evidence: Optional[List[str]] = []  # Specific examples
+
+class SegmentEvaluation(BaseModel):
+    segment_id: int
+    text: str
+    
+    # Core Metrics (Original 5) - REQUIRED
+    clarity: ScoreDetail
+    structure: ScoreDetail
+    correctness: ScoreDetail
+    pacing: ScoreDetail
+    communication: ScoreDetail
+    
+    # ===== NEW: Advanced Metrics - OPTIONAL for backward compatibility =====
+    engagement: Optional[ScoreDetail] = None
+    examples: Optional[ScoreDetail] = None
+    questioning: Optional[ScoreDetail] = None
+    adaptability: Optional[ScoreDetail] = None
+    relevance: Optional[ScoreDetail] = None
+    
+    overall_segment_score: float
+    topic_alignment: Optional[float] = None  # How well aligned with topic (0-1)
+
+class Metrics(BaseModel):
+    # Core Metrics - REQUIRED
+    clarity: float
+    structure: float
+    correctness: float
+    pacing: float
+    communication: float
+    
+    # ===== NEW: Advanced Metrics - OPTIONAL =====
+    engagement: Optional[float] = None
+    examples: Optional[float] = None
+    questioning: Optional[float] = None
+    adaptability: Optional[float] = None
+    relevance: Optional[float] = None
+
+class EvaluationBase(BaseModel):
+    session_id: str
+    overall_score: float  # 1-10 weighted average
+    metrics: Metrics
+    segments: List[SegmentEvaluation]
+    
+    # ===== NEW: Topic Analysis =====
+    topic_analysis: Optional[dict] = {
+        "stated_topic": "",
+        "detected_topics": [],
+        "relevance_score": 0.0,
+        "topic_drift": [],
+        "related_topics_bonus": 0.0
+    }
+
+class EvaluationCreate(EvaluationBase):
+    pass
+
+class EvaluationInDB(EvaluationBase):
+    id: str = Field(alias="_id")
+    created_at: datetime
+    llm_provider: str
+    llm_model: str
+    
+    class Config:
+        populate_by_name = True
+
+class EvaluationSummary(BaseModel):
+    evaluation_id: str
+    session_id: str
+    overall_score: float
+    metrics: Metrics
+    strengths: List[str]
+    areas_for_improvement: List[str]
+    created_at: datetime
+    topic_analysis: Optional[dict] = None
