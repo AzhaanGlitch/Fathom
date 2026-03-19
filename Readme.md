@@ -1,11 +1,11 @@
-# MindTrace
+# fathom
 
 **AI-Powered Mentor Evaluation System for Educational Excellence**
 
 An explainable evaluation platform that analyzes teaching sessions using advanced LLMs. Upload videos, get detailed feedback across multiple dimensions (clarity, structure, correctness, pacing, communication, engagement, examples, questioning, adaptability, and relevance), and receive actionable insights to improve teaching quality at scale.
 
 [![Frontend](https://img.shields.io/badge/Frontend-Live%20on%20Vercel-00C7B7?style=for-the-badge&logo=vercel)](https://mind-trace-beta.vercel.app/)
-[![Backend](https://img.shields.io/badge/Backend-Deployed%20on%20HuggingFace-FFD21E?style=for-the-badge&logo=huggingface)](https://huggingface.co/spaces/ParthG2209/MindTrace)
+[![Backend](https://img.shields.io/badge/Backend-Deployed%20on%20HuggingFace-FFD21E?style=for-the-badge&logo=huggingface)](https://huggingface.co/spaces/ParthG2209/fathom)
 
 ![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat&logo=react&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
@@ -33,7 +33,7 @@ An explainable evaluation platform that analyzes teaching sessions using advance
 
 ## Target Audience
 
-MindTrace is specifically designed for:
+fathom is specifically designed for:
 
 ### Large Universities & Educational Institutions
 - **Multi-Department Deployment**: Manage hundreds of instructors across various departments
@@ -58,14 +58,14 @@ MindTrace is specifically designed for:
 ## Live Demo
 
 - **Frontend Application**: [https://mind-trace-beta.vercel.app/](https://mind-trace-beta.vercel.app/)
-- **Backend API**: [https://huggingface.co/spaces/ParthG2209/MindTrace](https://huggingface.co/spaces/ParthG2209/MindTrace)
+- **Backend API**: [https://huggingface.co/spaces/ParthG2209/fathom](https://huggingface.co/spaces/ParthG2209/fathom)
 - **API Documentation**: [Backend URL]/docs
 
 ---
 
 ##  Overview
 
-MindTrace transforms teaching evaluation by providing:
+fathom transforms teaching evaluation by providing:
 - **🤖 AI-Powered Analysis**: Multi-dimensional evaluation using Google Gemini & Groq LLMs
 - **🔍 Explainable Insights**: Evidence-based feedback with specific problematic phrases
 - **✍️ Smart Rewrites**: AI-generated improvements for unclear explanations
@@ -405,7 +405,7 @@ Create a `.env` file:
 ```env
 # MongoDB
 MONGODB_URL=mongodb://localhost:27017
-DATABASE_NAME=mindtrace
+DATABASE_NAME=fathom
 
 # LLM Configuration
 LLM_STRATEGY=hybrid  # Options: gemini, groq, hybrid
@@ -457,7 +457,7 @@ npm install
 3. **Configure environment variables**
 Create a `.env` file:
 ```env
-REACT_APP_API_URL=https://huggingface.co/spaces/ParthG2209/MindTrace
+REACT_APP_API_URL=https://huggingface.co/spaces/ParthG2209/fathom
 
 # Firebase Configuration
 REACT_APP_FIREBASE_API_KEY=your_api_key
@@ -891,8 +891,8 @@ npm run test:coverage
 **Backend**
 ```bash
 cd backend
-docker build -t mindtrace-backend .
-docker run -p 8000:8000 --env-file .env mindtrace-backend
+docker build -t fathom-backend .
+docker run -p 8000:8000 --env-file .env fathom-backend
 ```
 
 **Docker Compose (Full Stack)**
@@ -1014,14 +1014,14 @@ npm run build
 ## Documentation
 
 ### For Developers
-- [API Reference](https://huggingface.co/spaces/ParthG2209/MindTrace/docs)
+- [API Reference](https://huggingface.co/spaces/ParthG2209/fathom/docs)
 - [Contributing Guide](CONTRIBUTING.md)
 - [Code Architecture](docs/architecture.md)
 - [Development Setup](docs/setup.md)
 
 ### For Users
 - [User Manual](docs/user-manual.md)
-- [Video Tutorials](https://youtube.com/playlist/mindtrace-tutorials)
+- [Video Tutorials](https://youtube.com/playlist/fathom-tutorials)
 - [FAQ](docs/faq.md)
 - [Best Practices](docs/best-practices.md)
 
@@ -1058,18 +1058,18 @@ npm run build
 ### Project Information
 - **Developer**: Parth Gupta
 - **LinkedIn**: [linkedin.com/in/parth-gupta-4598b8324/](https://www.linkedin.com/in/parth-gupta-4598b8324/)
-- **GitHub**: [github.com/ParthG2209/MindTrace](https://github.com/ParthG2209/MindTrace)
+- **GitHub**: [github.com/ParthG2209/fathom](https://github.com/ParthG2209/fathom)
 - **Email**: guptaparth2209@gmail.com
 
 ### Support Channels
-- **Issues**: [GitHub Issues](https://github.com/ParthG2209/MindTrace/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ParthG2209/MindTrace/discussions)
-- **Email Support**: support@mindtrace.ai (for enterprise customers)
+- **Issues**: [GitHub Issues](https://github.com/ParthG2209/fathom/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/ParthG2209/fathom/discussions)
+- **Email Support**: support@fathom.ai (for enterprise customers)
 
 ### Enterprise Inquiries
 For institutional deployments, custom features, or consulting services:
-- Email: enterprise@mindtrace.ai
-- Schedule a demo: [calendly.com/mindtrace](https://calendly.com/mindtrace)
+- Email: enterprise@fathom.ai
+- Schedule a demo: [calendly.com/fathom](https://calendly.com/fathom)
 
 ---
 
@@ -1083,12 +1083,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Project Status
 
-![GitHub last commit](https://img.shields.io/github/last-commit/ParthG2209/MindTrace)
-![GitHub issues](https://img.shields.io/github/issues/ParthG2209/MindTrace)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/ParthG2209/MindTrace)
-![GitHub stars](https://img.shields.io/github/stars/ParthG2209/MindTrace?style=social)
-![GitHub forks](https://img.shields.io/github/forks/ParthG2209/MindTrace?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/ParthG2209/MindTrace?style=social)
+![GitHub last commit](https://img.shields.io/github/last-commit/ParthG2209/fathom)
+![GitHub issues](https://img.shields.io/github/issues/ParthG2209/fathom)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/ParthG2209/fathom)
+![GitHub stars](https://img.shields.io/github/stars/ParthG2209/fathom?style=social)
+![GitHub forks](https://img.shields.io/github/forks/ParthG2209/fathom?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/ParthG2209/fathom?style=social)
 
 **Current Version**: 2.0.0  
 **Last Updated**: December 2025  
@@ -1099,24 +1099,24 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Star History
 
-If you find MindTrace useful, please consider starring the repository! It helps us understand what features the community values most and motivates continued development.
+If you find fathom useful, please consider starring the repository! It helps us understand what features the community values most and motivates continued development.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ParthG2209/MindTrace&type=Date)](https://star-history.com/#ParthG2209/MindTrace&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=ParthG2209/fathom&type=Date)](https://star-history.com/#ParthG2209/fathom&Date)
 
 ---
 
 ## Academic Citation
 
-If you use MindTrace in your research or academic work, please cite:
+If you use fathom in your research or academic work, please cite:
 
 ```bibtex
-@software{mindtrace2025,
+@software{fathom2025,
   author = {Gupta, Parth},
-  title = {MindTrace: AI-Powered Mentor Evaluation System},
+  title = {fathom: AI-Powered Mentor Evaluation System},
   year = {2025},
   publisher = {GitHub},
   journal = {GitHub repository},
-  howpublished = {\url{https://github.com/ParthG2209/MindTrace}},
+  howpublished = {\url{https://github.com/ParthG2209/fathom}},
   version = {2.0.0}
 }
 ```
@@ -1125,7 +1125,7 @@ If you use MindTrace in your research or academic work, please cite:
 
 ## Future Vision
 
-MindTrace aims to revolutionize teaching evaluation by:
+fathom aims to revolutionize teaching evaluation by:
 1. **Democratizing Quality Education**: Making expert-level evaluation accessible to all institutions
 2. **Evidence-Based Improvement**: Providing actionable, data-driven feedback for instructors
 3. **Scaling Excellence**: Enabling quality education at scale through AI-powered insights
@@ -1138,8 +1138,8 @@ Join us in transforming education, one evaluation at a time!
 
 <div align="center">
 
-[Website](https://mind-trace-beta.vercel.app/) • [API](https://huggingface.co/spaces/ParthG2209/MindTrace) • [Support](mailto:guptaparth2209@gmail.com)
+[Website](https://mind-trace-beta.vercel.app/) • [API](https://huggingface.co/spaces/ParthG2209/fathom) • [Support](mailto:guptaparth2209@gmail.com)
 
-Copyright © 2025 MindTrace. All rights reserved.
+Copyright © 2025 fathom. All rights reserved.
 
 </div>
