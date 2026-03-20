@@ -2,6 +2,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage.jsx';
+import RoleSelectionPage from './pages/RoleSelectionPage.jsx';
+import FacultyTypePage from './pages/FacultyTypePage.jsx';
 import LoginPage from './components/ui/animated-characters-login-page.jsx';
 import DashboardLayout from './layouts/DashboardLayout.jsx';
 import DashboardHome from './pages/Dashboard/DashboardHome.jsx';
@@ -18,6 +20,8 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/get-started" element={<RoleSelectionPage />} />
+        <Route path="/get-started/faculty" element={<FacultyTypePage />} />
         <Route path="/login" element={<LoginPage />} />
         
         {/* Dashboard Routes */}
