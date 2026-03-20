@@ -10,7 +10,8 @@ import {
   Video,
   Users,
   Settings as SettingsIcon,
-  BarChart3
+  BarChart3,
+  Shield
 } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { signOut } from 'firebase/auth';
@@ -26,6 +27,7 @@ const DashboardLayout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userRole, setUserRole] = useState('institution-faculty');
   const [hoveredItem, setHoveredItem] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     // Read role from localStorage
@@ -36,13 +38,10 @@ const DashboardLayout = () => {
       if (currentUser) {
         setUser(currentUser);
       } else {
-        // Bypass auth for frontend development - use mock user
-        setUser({
-          displayName: 'Dev User',
-          email: 'dev@fathom.app',
-          uid: 'dev-mock-uid'
-        });
+        // If no user is authenticated, redirect to login
+        navigate('/login');
       }
+      setAuthLoading(false);
     });
     return () => unsubscribe();
   }, [navigate]);
@@ -56,6 +55,14 @@ const DashboardLayout = () => {
     localStorage.removeItem('userRole');
     navigate('/login');
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
+  }
 
   const handleStateChange = (state) => {
     setMenuOpen(state.isOpen);
@@ -98,6 +105,12 @@ const DashboardLayout = () => {
       label: 'Mentors',
       href: '/dashboard/mentors',
       icon: Users,
+      roles: ['admin'],
+    },
+    {
+      label: 'Access Code',
+      href: '/dashboard/access-code',
+      icon: Shield,
       roles: ['admin'],
     },
     {
@@ -279,7 +292,7 @@ const DashboardLayout = () => {
 
       {/* ============ MAIN CONTENT ============ */}
       <div className="flex flex-1 flex-col w-full lg:ml-16">
-        <main className="p-6 flex-1 relative z-30 overflow-auto">
+        <main className="p-6 pt-16 lg:pt-8 flex-1 relative z-30 overflow-auto">
           <Outlet />
         </main>
         <div className="relative z-10">
