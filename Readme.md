@@ -57,7 +57,7 @@ fathom is specifically designed for:
 
 ## Live Demo
 
-- **Frontend Application**: [https://mind-trace-beta.vercel.app/](https://mind-trace-beta.vercel.app/)
+- **Frontend Application**: [https://fathom-murex.vercel.app/](https://fathom-murex.vercel.app/)
 - **Backend API**: [https://huggingface.co/spaces/ParthG2209/fathom](https://huggingface.co/spaces/ParthG2209/fathom)
 - **API Documentation**: [Backend URL]/docs
 
