@@ -789,7 +789,7 @@ npm run build
 **CORS Issues**
 - Backend CORS is configured for:
   - `http://localhost:3000`
-  - `https://mind-trace-beta.vercel.app`
+  - `https://fathom-murex.vercel.app/`
   - `https://*.vercel.app`
   - Update `main.py` if deploying to different domain
 
