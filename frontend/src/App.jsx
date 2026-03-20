@@ -13,6 +13,7 @@ import SessionDetailPage from './pages/Dashboard/SessionDetailPage.jsx';
 import AnalyticsPage from './pages/Dashboard/AnalyticsPage.jsx';
 import ProfilePage from './pages/Dashboard/ProfilePage.jsx';
 import SettingsPage from './pages/Dashboard/SettingsPage.jsx';
+import AccessCodeGenerator from './pages/Dashboard/AccessCodeGenerator.jsx';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="sessions" element={<SessionsPage />} />
           <Route path="sessions/:sessionId" element={<SessionDetailPage />} />
           <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="access-code" element={<AccessCodeGenerator />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
