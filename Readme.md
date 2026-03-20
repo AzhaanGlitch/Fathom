@@ -1,10 +1,10 @@
-# fathom
+<img width="384" height="320" alt="image" src="https://github.com/user-attachments/assets/d2094f55-eb3a-4760-ae29-419cfec79be3" /># fathom
 
 **AI-Powered Mentor Evaluation System for Educational Excellence**
 
 An explainable evaluation platform that analyzes teaching sessions using advanced LLMs. Upload videos, get detailed feedback across multiple dimensions (clarity, structure, correctness, pacing, communication, engagement, examples, questioning, adaptability, and relevance), and receive actionable insights to improve teaching quality at scale.
 
-[![Frontend](https://img.shields.io/badge/Frontend-Live%20on%20Vercel-00C7B7?style=for-the-badge&logo=vercel)](https://mind-trace-beta.vercel.app/)
+[![Frontend](https://img.shields.io/badge/Frontend-Live%20on%20Vercel-00C7B7?style=for-the-badge&logo=vercel)](https://fathom-murex.vercel.app/)
 [![Backend](https://img.shields.io/badge/Backend-Deployed%20on%20HuggingFace-FFD21E?style=for-the-badge&logo=huggingface)](https://huggingface.co/spaces/ParthG2209/fathom)
 
 ![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat&logo=react&logoColor=white)
@@ -480,7 +480,7 @@ The application will open at `http://localhost:3000`
 ## Quick Start Guide
 
 ### 1. Sign Up / Login
-- Visit [https://mind-trace-beta.vercel.app/](https://mind-trace-beta.vercel.app/)
+- Visit [https://fathom-murex.vercel.app/](https://fathom-murex.vercel.app/)
 - Sign up with email/password or Google OAuth
 - Access the dashboard
 
@@ -1138,7 +1138,7 @@ Join us in transforming education, one evaluation at a time!
 
 <div align="center">
 
-[Website](https://mind-trace-beta.vercel.app/) • [API](https://huggingface.co/spaces/ParthG2209/fathom) • [Support](mailto:guptaparth2209@gmail.com)
+[Website](https://fathom-murex.vercel.app/) • [API](https://huggingface.co/spaces/ParthG2209/fathom) • [Support](mailto:guptaparth2209@gmail.com)
 
 Copyright © 2025 fathom. All rights reserved.
 
