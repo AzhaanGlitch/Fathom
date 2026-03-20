@@ -286,17 +286,50 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Store role and bypass authentication for frontend development
-    localStorage.setItem('userRole', activeRole);
-    const defaultRoute = activeRole === 'admin' ? '/dashboard/analytics' : '/dashboard';
-    navigate(defaultRoute);
+    setIsLoading(true);
+    setError("");
+
+    try {
+      if (isSignUp) {
+        // Simple client-side check for admin code
+        if (activeRole === 'admin' && adminCode !== 'ADMIN2024') {
+          throw new Error('Invalid administration access code.');
+        }
+
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Update display name
+        await updateProfile(userCredential.user, { displayName: name });
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+
+      // Store role and navigate
+      localStorage.setItem('userRole', activeRole);
+      const defaultRoute = activeRole === 'admin' ? '/dashboard/analytics' : '/dashboard';
+      navigate(defaultRoute);
+    } catch (err) {
+      console.error("Auth error:", err);
+      setError(err.message || "Failed to authenticate. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignIn = async () => {
-    // Store role and bypass authentication for frontend development
-    localStorage.setItem('userRole', activeRole);
-    const defaultRoute = activeRole === 'admin' ? '/dashboard/analytics' : '/dashboard';
-    navigate(defaultRoute);
+    setIsLoading(true);
+    setError("");
+    try {
+      await signInWithPopup(auth, googleProvider);
+      // Store role and navigate
+      localStorage.setItem('userRole', activeRole);
+      const defaultRoute = activeRole === 'admin' ? '/dashboard/analytics' : '/dashboard';
+      navigate(defaultRoute);
+    } catch (err) {
+      console.error("Google auth error:", err);
+      setError("Failed to sign in with Google.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const toggleAuthMode = () => {
