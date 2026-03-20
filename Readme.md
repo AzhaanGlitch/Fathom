@@ -76,6 +76,70 @@ fathom transforms teaching evaluation by providing:
 
 ---
 
+---
+
+## 🔐 Role-Based Access System
+
+fathom supports a **multi-role authentication system**, enabling customized experiences for administrators and educators at different levels.
+
+---
+
+### Administrator Access
+
+- Dedicated **Admin Login Portal**
+- Secure login using:
+  - Admin Access Code
+  - Email & Password
+- Full platform control:
+  - Add, update, and delete mentors
+  - Access all teaching sessions across the institution
+  - View complete analytics and evaluation reports
+  - Monitor overall teaching quality trends
+
+---
+
+### Faculty / Teacher Access
+
+Faculty users are categorized into two types:
+
+#### Institutional Faculty
+
+- Login using:
+  - **Institution Code** (provided by administrator)
+  - Email
+- Access permissions:
+  - View and manage their own sessions
+  - Access institution-level insights (based on permissions)
+- Ideal for:
+  - Universities and large educational institutions
+  - Structured faculty evaluation systems
+
+---
+
+#### Independent Educators (Solo Faculty)
+
+- Direct login using:
+  - Email & Password
+- No institution required
+- Use-cases:
+  - Self-evaluation of teaching sessions
+  - Personal performance tracking
+  - Continuous skill improvement using AI feedback
+
+---
+
+### Why This Matters
+
+This feature makes fathom highly flexible and scalable:
+
+- **Institutions** → Centralized control and analytics
+- **Faculty** → Personalized feedback and improvement
+- **EdTech Platforms** → Supports multiple users and institutions on a single platform
+
+By supporting both **large scale institution** and **individual educators**, fathom connects institutional scale with personalized teaching improvement.
+
+---
+
 ## Scalability & Performance
 
 ### Architecture for Scale
