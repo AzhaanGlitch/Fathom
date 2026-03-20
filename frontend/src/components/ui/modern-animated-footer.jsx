@@ -23,7 +23,7 @@ export const Footer = ({
               <div className="space-y-2 flex flex-col items-center flex-1">
                 <div className="flex items-center gap-2">
                 </div>
-                <p className="text-gray-300 font-semibold text-center w-full max-w-sm sm:w-96 px-4 sm:px-0 transition-colors duration-300 text-sm">
+                <p className="text-gray-600 dark:text-gray-300 font-semibold text-center w-full max-w-sm sm:w-96 px-4 sm:px-0 transition-colors duration-300 text-sm">
                   {brandDescription}
                 </p>
               </div>
@@ -35,7 +35,7 @@ export const Footer = ({
                     <a
                       key={index}
                       href={link.href}
-                      className="text-gray-400 hover:text-white transition-colors duration-300"
+                      className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -50,11 +50,11 @@ export const Footer = ({
 
               {/* Navigation Links */}
               {navLinks.length > 0 && (
-                <div className="flex flex-wrap justify-center gap-4 text-xs font-medium text-gray-400 max-w-full px-4 transition-colors duration-300">
+                <div className="flex flex-wrap justify-center gap-4 text-xs font-medium text-gray-600 dark:text-gray-400 max-w-full px-4 transition-colors duration-300">
                   {navLinks.map((link, index) => (
                     <a
                       key={index}
-                      className="hover:text-white duration-300 hover:font-semibold"
+                      className="hover:text-black dark:hover:text-white duration-300 hover:font-semibold"
                       href={link.href}
                     >
                       {link.label}
@@ -67,7 +67,7 @@ export const Footer = ({
 
           {/* Copyright & Creator */}
           <div className="mt-12 md:mt-16 flex flex-col gap-2 md:gap-1 items-center justify-center md:flex-row md:items-center md:justify-between px-4 md:px-0">
-            <p className="text-sm text-gray-400 text-center md:text-left transition-colors duration-300">
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center md:text-left transition-colors duration-300">
               ©{new Date().getFullYear()} {brandName}. All rights reserved.
             </p>
             {creatorName && creatorUrl && (
@@ -76,7 +76,7 @@ export const Footer = ({
                   href={creatorUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-gray-400 hover:text-white transition-colors duration-300 hover:font-medium"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300 hover:font-medium"
                 >
                   Crafted by {creatorName}
                 </a>
@@ -86,7 +86,7 @@ export const Footer = ({
         </div>
         
         <div 
-          className="bg-gradient-to-b from-white/20 via-white/10 to-transparent bg-clip-text text-transparent leading-none absolute left-1/2 -translate-x-1/2 bottom-32 md:bottom-28 font-extrabold tracking-tighter pointer-events-none select-none text-center px-4 transition-colors duration-300"
+          className="bg-gradient-to-b from-black/20 via-black/10 dark:from-white/20 dark:via-white/10 to-transparent bg-clip-text text-transparent leading-none absolute left-1/2 -translate-x-1/2 bottom-32 md:bottom-28 font-extrabold tracking-tighter pointer-events-none select-none text-center px-4 transition-colors duration-300"
           style={{
             fontSize: 'clamp(3rem, 12vw, 10rem)',
             maxWidth: '95vw'
@@ -96,10 +96,10 @@ export const Footer = ({
         </div>
 
         {/* Bottom logo - Reduced size */}
-        <div className="absolute hover:border-white duration-400 drop-shadow-[0_0px_20px_rgba(255,255,255,0.3)] bottom-16 md:bottom-14 backdrop-blur-sm rounded-2xl bg-black/60 left-1/2 border-2 border-white/20 flex items-center justify-center p-2 -translate-x-1/2 z-[0] transition-colors duration-300">
-          <div className="w-10 sm:w-12 md:w-16 h-10 sm:h-12 md:h-16 bg-gradient-to-br from-white to-white/80 rounded-xl flex items-center justify-center shadow-lg transition-colors duration-300">
+        <div className="absolute bottom-16 md:bottom-14 left-1/2 -translate-x-1/2 z-[0] transition-all duration-300 hover:scale-110 drop-shadow-2xl">
+          <div className="w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24 flex items-center justify-center">
             {brandIcon || (
-              <Award className="w-6 sm:w-8 md:w-10 h-6 sm:h-8 md:h-10 text-black drop-shadow-lg transition-colors duration-300" />
+              <Award className="w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 text-white transition-colors duration-300" />
             )}
           </div>
         </div>
