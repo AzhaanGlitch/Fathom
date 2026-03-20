@@ -25,15 +25,8 @@ const LandingPage = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-black' : 'bg-white'}`} style={{ zoom: '0.95' }}>
-      {/* Fixed Top Bar with Sign In Button */}
-      <div className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center">
-        <button
-          onClick={() => navigate('/login')}
-          className="inline-flex items-center justify-center gap-4 h-11 rounded-md px-8 text-base font-semibold bg-blue-600 dark:bg-white text-white dark:text-black hover:bg-blue-700 dark:hover:bg-gray-200 transition-colors duration-300"
-        >
-          Get Started Free <MoveRight className="w-4 h-4" />
-        </button>
-
+      {/* Fixed Top Bar with Dark Mode Toggle */}
+      <div className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-end items-center">
         {/* Floating Dark Mode Toggle */}
         <button
           onClick={toggleDarkMode}
@@ -49,11 +42,11 @@ const LandingPage = () => {
       {/* Hero Section with Sparkles */}
       <div className={`h-screen relative w-full flex flex-col items-center justify-center overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-black' : 'bg-white'
         }`}>
-        <h1 className={`md:text-7xl text-3xl lg:text-9xl font-bold text-center relative z-20 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'
+        <h1 className={`text-6xl md:text-[4rem] lg:text-[10rem] pt-40 leading-none tracking-tighter font-extrabold text-center relative z-20 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'
           }`}>
           Fathom
         </h1>
-        <div className="w-[40rem] h-40 relative">
+        <div className="w-[90vw] max-w-[70rem] h-40 relative [mask-image:radial-gradient(350px_200px_at_top,white_20%,transparent)] [-webkit-mask-image:radial-gradient(350px_200px_at_top,white_20%,transparent)]">
           {/* Gradients */}
           <div className={`absolute inset-x-20 top-0 h-[2px] w-3/4 blur-sm ${darkMode
               ? 'bg-gradient-to-r from-transparent via-white to-transparent'
@@ -80,16 +73,23 @@ const LandingPage = () => {
             className="w-full h-full"
             particleColor={darkMode ? "#FFFFFF" : "#000000"}
           />
-          {/* Radial Gradient to prevent sharp edges */}
-          <div className={`absolute inset-0 w-full h-full ${darkMode
-              ? 'bg-black [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,black)]'
-              : 'bg-white [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]'
-            }`}></div>
         </div>
         <p className={`text-xl mt-8 max-w-2xl text-center px-4 relative z-20 transition-colors duration-300 ${darkMode ? 'text-gray-300' : 'text-gray-600'
           }`}>
           Explainable Mentor Evaluation System
         </p>
+
+        {/* Glassy Capsule Button */}
+        <button
+          onClick={() => navigate('/get-started')}
+          className={`relative z-20 mt-10 inline-flex items-center justify-center gap-3 h-14 rounded-full px-10 text-lg font-semibold transition-all duration-300 backdrop-blur-xl ${
+            darkMode
+              ? 'bg-white/40 text-white border border-white/20 hover:bg-white/20 hover:scale-105 shadow-[0_8px_32px_0_rgba(255,255,255,0.05)]'
+              : 'bg-black/5 text-gray-900 border border-black/10 hover:bg-black/10 hover:scale-105 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)]'
+          }`}
+        >
+          Get Started Free <MoveRight className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Scroll Animation Section */}
