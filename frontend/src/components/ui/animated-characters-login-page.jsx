@@ -1,5 +1,8 @@
 // frontend/src/components/ui/animated-characters-login-page.jsx
-// KEY CHANGE: institution code is now validated against the backend before login succeeds.
+// KEY CHANGES:
+//  1. Solo-faculty sign-up collects a "Faculty Name" and auto-creates a mentor record
+//  2. Institution-faculty login resolves the access code → uses institution_name as mentor name
+//  3. Both flows store mentorId in localStorage so the rest of the app uses it automatically
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "./button";
@@ -16,12 +19,41 @@ import {
 } from "firebase/auth";
 import { auth, googleProvider } from "../../lib/firebase";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { accessCodeApi } from "../../api/client";
+import { accessCodeApi, mentorApi } from "../../api/client";
 
-// ──────────────────────────────────────────────────────────────────────────────
-// Eye / Pupil components (unchanged from original)
-// ──────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Helper: ensure a mentor record exists for this user; return its id
+// ─────────────────────────────────────────────────────────────────────────────
+async function ensureMentorExists({ name, email, userUid, role, institutionName }) {
+  try {
+    // Ask the backend for a mentor tied to this Firebase UID
+    const existing = await mentorApi.getByOwner(userUid);
+    if (existing?.data?.id) return existing.data.id;
+  } catch (_) {
+    // 404 or network — fall through to create
+  }
 
+  // Create a new mentor record owned by this user
+  const mentorName =
+    role === "institution-faculty"
+      ? institutionName || name
+      : name;
+
+  const res = await mentorApi.create({
+    name: mentorName,
+    email: email,
+    expertise: [],
+    bio: "",
+    owner_uid: userUid,
+    role: role,
+    institution_name: role === "institution-faculty" ? institutionName : undefined,
+  });
+  return res.data.id || res.data._id;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Eye / Pupil components (unchanged)
+// ─────────────────────────────────────────────────────────────────────────────
 const Pupil = ({ size = 12, maxDistance = 5, pupilColor = "black", forceLookX, forceLookY }) => {
   const [mouseX, setMouseX] = useState(0);
   const [mouseY, setMouseY] = useState(0);
@@ -103,18 +135,16 @@ const EyeBall = ({ size = 48, pupilSize = 16, maxDistance = 10, eyeColor = "whit
   );
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
-// Institution Code Field with live validation indicator
-// ──────────────────────────────────────────────────────────────────────────────
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Institution Code Field with live validation
+// ─────────────────────────────────────────────────────────────────────────────
 const InstitutionCodeField = ({ value, onChange, validationState }) => {
-  // validationState: null | 'checking' | 'valid' | 'invalid'
   const borderClass =
-    validationState === 'valid'
-      ? 'border-green-500/60 focus:border-green-500'
-      : validationState === 'invalid'
-        ? 'border-red-500/60 focus:border-red-500'
-        : 'border-gray-300 focus:border-black';
+    validationState === "valid"
+      ? "border-green-500/60 focus:border-green-500"
+      : validationState === "invalid"
+        ? "border-red-500/60 focus:border-red-500"
+        : "border-gray-300 focus:border-black";
 
   return (
     <div className="space-y-2">
@@ -132,25 +162,18 @@ const InstitutionCodeField = ({ value, onChange, validationState }) => {
           className={`h-12 pr-10 bg-white text-gray-900 ${borderClass} font-mono text-xs`}
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          {validationState === 'checking' && (
-            <Loader className="w-4 h-4 animate-spin text-gray-400" />
-          )}
-          {validationState === 'valid' && (
-            <CheckCircle className="w-4 h-4 text-green-500" />
-          )}
-          {validationState === 'invalid' && (
-            <XCircle className="w-4 h-4 text-red-500" />
-          )}
+          {validationState === "checking" && <Loader className="w-4 h-4 animate-spin text-gray-400" />}
+          {validationState === "valid" && <CheckCircle className="w-4 h-4 text-green-500" />}
+          {validationState === "invalid" && <XCircle className="w-4 h-4 text-red-500" />}
         </div>
       </div>
     </div>
   );
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 // Main Login Page
-// ──────────────────────────────────────────────────────────────────────────────
-
+// ─────────────────────────────────────────────────────────────────────────────
 function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -166,13 +189,14 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
+  const [facultyName, setFacultyName] = useState(""); // solo faculty display name
   const [institutionCode, setInstitutionCode] = useState("");
-  const [institutionName, setInstitutionName] = useState("");
+  const [institutionName, setInstitutionName] = useState(""); // admin sign-up
   const [adminCode, setAdminCode] = useState("");
 
   // Institution code validation
-  const [codeValidation, setCodeValidation] = useState(null); // null | 'checking' | 'valid' | 'invalid'
-  const [codeValidationMsg, setCodeValidationMsg] = useState('');
+  const [codeValidation, setCodeValidation] = useState(null);
+  const [codeValidationMsg, setCodeValidationMsg] = useState("");
   const [verifiedInstitution, setVerifiedInstitution] = useState(null);
   const validateTimerRef = useRef(null);
 
@@ -200,7 +224,6 @@ function LoginPage() {
     return () => window.removeEventListener("mousemove", h);
   }, []);
 
-  // Purple blink
   useEffect(() => {
     const schedule = () => {
       const t = setTimeout(() => {
@@ -213,7 +236,6 @@ function LoginPage() {
     return () => clearTimeout(t);
   }, []);
 
-  // Black blink
   useEffect(() => {
     const schedule = () => {
       const t = setTimeout(() => {
@@ -226,7 +248,6 @@ function LoginPage() {
     return () => clearTimeout(t);
   }, []);
 
-  // Look-at-each-other when typing
   useEffect(() => {
     if (isTyping) {
       setIsLookingAtEachOther(true);
@@ -236,7 +257,6 @@ function LoginPage() {
     setIsLookingAtEachOther(false);
   }, [isTyping]);
 
-  // Purple peeking
   useEffect(() => {
     if (password.length > 0 && showPassword) {
       const schedule = () => {
@@ -252,56 +272,39 @@ function LoginPage() {
     setIsPurplePeeking(false);
   }, [password, showPassword, isPurplePeeking]);
 
-  // ── Institution code debounce validation ─────────────────────────────────
-
+  // ── Institution code debounce validation ──────────────────────────────────
   useEffect(() => {
-    // Only validate for institution-faculty role
-    if (activeRole !== 'institution-faculty') return;
-
-    // Reset if empty
+    if (activeRole !== "institution-faculty") return;
     if (!institutionCode.trim()) {
-      setCodeValidation(null);
-      setCodeValidationMsg('');
-      setVerifiedInstitution(null);
+      setCodeValidation(null); setCodeValidationMsg(""); setVerifiedInstitution(null);
       return;
     }
-
-    // SHA-256 is always 64 hex chars — don't bother calling API until then
     if (institutionCode.trim().length < 64) {
-      setCodeValidation(null);
-      setCodeValidationMsg('');
-      setVerifiedInstitution(null);
+      setCodeValidation(null); setCodeValidationMsg(""); setVerifiedInstitution(null);
       return;
     }
-
     if (validateTimerRef.current) clearTimeout(validateTimerRef.current);
-    setCodeValidation('checking');
-
+    setCodeValidation("checking");
     validateTimerRef.current = setTimeout(async () => {
       try {
         const res = await accessCodeApi.verify({ code_hash: institutionCode.trim() });
         if (res.data.valid) {
-          setCodeValidation('valid');
-          setCodeValidationMsg(res.data.institution_name ? `✓ ${res.data.institution_name}` : '✓ Valid code');
+          setCodeValidation("valid");
+          setCodeValidationMsg(res.data.institution_name ? `✓ ${res.data.institution_name}` : "✓ Valid code");
           setVerifiedInstitution(res.data.institution_name);
         } else {
-          setCodeValidation('invalid');
-          setCodeValidationMsg(res.data.message || 'Invalid or revoked code');
+          setCodeValidation("invalid");
+          setCodeValidationMsg(res.data.message || "Invalid or revoked code");
           setVerifiedInstitution(null);
         }
       } catch {
-        // If the backend route doesn't exist yet, allow login (graceful degradation)
-        setCodeValidation(null);
-        setCodeValidationMsg('');
-        setVerifiedInstitution(null);
+        setCodeValidation(null); setCodeValidationMsg(""); setVerifiedInstitution(null);
       }
     }, 600);
-
     return () => { if (validateTimerRef.current) clearTimeout(validateTimerRef.current); };
   }, [institutionCode, activeRole]);
 
-  // ── Character position helpers ───────────────────────────────────────────
-
+  // ── Character helpers ─────────────────────────────────────────────────────
   const calculatePosition = (ref) => {
     if (!ref.current) return { faceX: 0, faceY: 0, bodySkew: 0 };
     const rect = ref.current.getBoundingClientRect();
@@ -319,77 +322,92 @@ function LoginPage() {
   const yellowPos = calculatePosition(yellowRef);
   const orangePos = calculatePosition(orangeRef);
 
-  // ── Submit ───────────────────────────────────────────────────────────────
-
+  // ── Submit ────────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
-      // ── Admin validation ──────────────────────────────────────────────
+      // Admin validation
       if (activeRole === "admin" && adminCode !== "ADMIN2024") {
         throw new Error("Invalid administration access code.");
       }
 
-      // ── Institution faculty: validate code against backend ────────────
+      // Institution faculty: validate code
       if (activeRole === "institution-faculty" && institutionCode.trim()) {
-        // If we already checked and it's invalid, block immediately
-        if (codeValidation === 'invalid') {
+        if (codeValidation === "invalid") {
           throw new Error(codeValidationMsg || "Invalid institution access code.");
         }
-
-        // If still checking or unknown, re-validate synchronously
-        if (codeValidation !== 'valid') {
+        if (codeValidation !== "valid") {
           try {
             const res = await accessCodeApi.verify({ code_hash: institutionCode.trim() });
-            if (!res.data.valid) {
-              throw new Error(res.data.message || "Invalid institution access code.");
-            }
+            if (!res.data.valid) throw new Error(res.data.message || "Invalid institution access code.");
             setVerifiedInstitution(res.data.institution_name);
           } catch (verifyErr) {
-            // If the route doesn't exist yet, skip validation gracefully
-            if (!verifyErr?.response) {
-              // network error or 404 on the route — allow through
-            } else {
-              throw verifyErr;
-            }
+            if (!verifyErr?.response) { /* network error — allow through */ }
+            else throw verifyErr;
           }
         }
       }
 
-      // ── Firebase auth ─────────────────────────────────────────────────
+      // Solo faculty: name required on sign-up
+      if (activeRole === "solo-faculty" && isSignUp && !facultyName.trim()) {
+        throw new Error("Please enter your faculty name.");
+      }
+
+      // Firebase auth
       let userCredential;
       if (isSignUp) {
-        if (password !== confirmPassword) {
-          throw new Error("Passwords do not match.");
-        }
+        if (password !== confirmPassword) throw new Error("Passwords do not match.");
         userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(userCredential.user, { displayName: name });
+        await updateProfile(userCredential.user, { displayName: name || facultyName });
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
 
-      // ── Bind institution code to this Firebase UID ────────────────────
+      const uid = userCredential.user.uid;
+
+      // Bind institution code
       if (activeRole === "institution-faculty" && institutionCode.trim()) {
         try {
-          await accessCodeApi.verify({
-            code_hash: institutionCode.trim(),
-            user_uid: userCredential.user.uid,
+          await accessCodeApi.verify({ code_hash: institutionCode.trim(), user_uid: uid });
+        } catch { /* best-effort */ }
+      }
+
+      // ── Auto-create / find mentor for non-admin roles ─────────────────────
+      let mentorId = null;
+      if (activeRole !== "admin") {
+        const resolvedName =
+          activeRole === "institution-faculty"
+            ? (verifiedInstitution || institutionCode.trim())
+            : facultyName.trim() || userCredential.user.displayName || email.split("@")[0];
+
+        try {
+          mentorId = await ensureMentorExists({
+            name: resolvedName,
+            email: userCredential.user.email,
+            userUid: uid,
+            role: activeRole,
+            institutionName: activeRole === "institution-faculty" ? verifiedInstitution : undefined,
           });
-        } catch {
-          // Binding is best-effort; don't block login
+        } catch (mentorErr) {
+          console.error("Failed to create/find mentor:", mentorErr);
+          // Non-fatal — the user can still log in; sessions just won't be pre-linked
         }
       }
 
-      // ── Store role & navigate ─────────────────────────────────────────
+      // Persist to localStorage
       localStorage.setItem("userRole", activeRole);
-      if (verifiedInstitution) {
-        localStorage.setItem("institutionName", verifiedInstitution);
+      localStorage.setItem("userId", uid);
+      if (mentorId) localStorage.setItem("mentorId", mentorId);
+      if (verifiedInstitution) localStorage.setItem("institutionName", verifiedInstitution);
+      if (activeRole === "solo-faculty" && facultyName.trim()) {
+        localStorage.setItem("facultyName", facultyName.trim());
       }
+
       const defaultRoute = activeRole === "admin" ? "/dashboard/analytics" : "/dashboard";
       navigate(defaultRoute);
-
     } catch (err) {
       console.error("Auth error:", err);
       setError(err.message || "Failed to authenticate. Please check your credentials.");
@@ -402,29 +420,46 @@ function LoginPage() {
     setIsLoading(true);
     setError("");
     try {
-      // Institution faculty must have a valid code before Google sign-in too
-      if (activeRole === "institution-faculty" && institutionCode.trim()) {
-        if (codeValidation === "invalid") {
-          throw new Error(codeValidationMsg || "Invalid institution access code.");
-        }
+      if (activeRole === "institution-faculty" && institutionCode.trim() && codeValidation === "invalid") {
+        throw new Error(codeValidationMsg || "Invalid institution access code.");
+      }
+      if (activeRole === "solo-faculty" && isSignUp && !facultyName.trim()) {
+        throw new Error("Please enter your faculty name before continuing.");
       }
 
       const userCredential = await signInWithPopup(auth, googleProvider);
+      const uid = userCredential.user.uid;
 
-      // Bind code if provided
-      if (activeRole === "institution-faculty" && institutionCode.trim() && codeValidation === 'valid') {
+      if (activeRole === "institution-faculty" && institutionCode.trim() && codeValidation === "valid") {
+        try { await accessCodeApi.verify({ code_hash: institutionCode.trim(), user_uid: uid }); } catch { }
+      }
+
+      let mentorId = null;
+      if (activeRole !== "admin") {
+        const resolvedName =
+          activeRole === "institution-faculty"
+            ? (verifiedInstitution || userCredential.user.displayName || email.split("@")[0])
+            : facultyName.trim() || userCredential.user.displayName || userCredential.user.email.split("@")[0];
+
         try {
-          await accessCodeApi.verify({
-            code_hash: institutionCode.trim(),
-            user_uid: userCredential.user.uid,
+          mentorId = await ensureMentorExists({
+            name: resolvedName,
+            email: userCredential.user.email,
+            userUid: uid,
+            role: activeRole,
+            institutionName: activeRole === "institution-faculty" ? verifiedInstitution : undefined,
           });
-        } catch {
-          // best-effort
+        } catch (mentorErr) {
+          console.error("Failed to create/find mentor:", mentorErr);
         }
       }
 
       localStorage.setItem("userRole", activeRole);
+      localStorage.setItem("userId", uid);
+      if (mentorId) localStorage.setItem("mentorId", mentorId);
       if (verifiedInstitution) localStorage.setItem("institutionName", verifiedInstitution);
+      if (activeRole === "solo-faculty" && facultyName.trim()) localStorage.setItem("facultyName", facultyName.trim());
+
       const defaultRoute = activeRole === "admin" ? "/dashboard/analytics" : "/dashboard";
       navigate(defaultRoute);
     } catch (err) {
@@ -439,7 +474,7 @@ function LoginPage() {
     setIsSignUp(!isSignUp);
     setError("");
     setEmail(""); setPassword(""); setConfirmPassword(""); setName("");
-    setInstitutionCode(""); setInstitutionName(""); setAdminCode("");
+    setFacultyName(""); setInstitutionCode(""); setInstitutionName(""); setAdminCode("");
     setCodeValidation(null); setCodeValidationMsg(""); setVerifiedInstitution(null);
   };
 
@@ -447,7 +482,7 @@ function LoginPage() {
     setActiveRole(role);
     setError("");
     setEmail(""); setPassword(""); setConfirmPassword(""); setName("");
-    setInstitutionCode(""); setInstitutionName(""); setAdminCode("");
+    setFacultyName(""); setInstitutionCode(""); setInstitutionName(""); setAdminCode("");
     setCodeValidation(null); setCodeValidationMsg(""); setVerifiedInstitution(null);
   };
 
@@ -616,7 +651,7 @@ function LoginPage() {
       </div>
 
       {/* ── Right form section ────────────────────────────────────────────── */}
-      <div className="flex items-center justify-center p-8 bg-slate-50">
+      <div className="flex items-center justify-center p-8 bg-slate-50 overflow-y-auto">
         <div className="w-full max-w-[420px]">
           <button
             onClick={() => navigate("/")}
@@ -639,8 +674,8 @@ function LoginPage() {
                 type="button"
                 onClick={() => switchRole(key)}
                 className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold transition-all duration-200 ${activeRole === key
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
                   }`}
               >
                 {label}
@@ -660,14 +695,38 @@ function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name (sign-up only) */}
-            {isSignUp && (
+            {/* Name (sign-up, non-solo) */}
+            {isSignUp && activeRole !== "solo-faculty" && (
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</Label>
                 <Input id="name" type="text" placeholder="Fathom User" value={name} autoComplete="off"
                   onChange={(e) => setName(e.target.value)} required
                   className="h-12 focus:border-black bg-white text-gray-900 border-gray-300"
                 />
+              </div>
+            )}
+
+            {/* Solo Faculty Name — always shown for solo role */}
+            {activeRole === "solo-faculty" && (
+              <div className="space-y-2">
+                <Label htmlFor="facultyName" className="text-sm font-medium text-gray-700">
+                  {isSignUp ? "Your Faculty Name" : "Faculty Name"}
+                </Label>
+                <Input
+                  id="facultyName"
+                  type="text"
+                  placeholder="e.g. Dr. Priya Sharma"
+                  value={facultyName}
+                  autoComplete="off"
+                  onChange={(e) => { setFacultyName(e.target.value); setIsTyping(true); setTimeout(() => setIsTyping(false), 500); }}
+                  required={isSignUp}
+                  className="h-12 focus:border-black bg-white text-gray-900 border-gray-300"
+                />
+                {isSignUp && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    This name will be used as your faculty profile and cannot be changed later.
+                  </p>
+                )}
               </div>
             )}
 
@@ -683,10 +742,8 @@ function LoginPage() {
                   }}
                   validationState={codeValidation}
                 />
-                {/* Feedback message */}
                 {codeValidationMsg && (
-                  <p className={`text-xs mt-1 ${codeValidation === 'valid' ? 'text-green-600' : 'text-red-500'
-                    }`}>
+                  <p className={`text-xs mt-1 ${codeValidation === "valid" ? "text-green-600" : "text-red-500"}`}>
                     {codeValidationMsg}
                   </p>
                 )}
@@ -787,7 +844,12 @@ function LoginPage() {
 
             <Button type="submit"
               className="w-full h-12 text-base font-medium bg-black text-white hover:bg-gray-800"
-              size="lg" disabled={isLoading || (activeRole === 'institution-faculty' && codeValidation === 'invalid')}
+              size="lg"
+              disabled={
+                isLoading ||
+                (activeRole === "institution-faculty" && codeValidation === "invalid") ||
+                (activeRole === "solo-faculty" && isSignUp && !facultyName.trim())
+              }
             >
               {isLoading
                 ? (isSignUp ? "Creating account…" : "Signing in…")
