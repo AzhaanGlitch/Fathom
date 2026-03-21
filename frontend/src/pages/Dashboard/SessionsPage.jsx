@@ -1,8 +1,4 @@
-// frontend/src/pages/Dashboard/SessionsPage.jsx
-// KEY CHANGES:
-//  - Non-admin users (solo-faculty / institution-faculty) have their mentorId from localStorage
-//    pre-filled and locked — no mentor selector shown.
-//  - Sessions list is also scoped to that mentorId automatically.
+
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -18,17 +14,18 @@ const SessionsPage = () => {
   const [searchParams] = useSearchParams();
   const urlMentorId = searchParams.get('mentor');
 
-  // ── Role / identity from localStorage ─────────────────────────────────────
+  // ── Role / identity ────────────────────────────────────────────────────────
   const userRole = localStorage.getItem('userRole') || 'institution-faculty';
   const isAdmin = userRole === 'admin';
-  const storedMentorId = localStorage.getItem('mentorId'); // set at login for non-admins
+  const storedMentorId = localStorage.getItem('mentorId');
 
-  // For non-admins always scope to their own mentor; for admins use URL param if present
+  // Non-admins are always scoped to their own mentor.
+  // Admins can optionally filter by a URL mentor param.
   const effectiveMentorId = isAdmin ? (urlMentorId || null) : storedMentorId;
 
   const [sessions, setSessions] = useState([]);
-  const [allMentors, setAllMentors] = useState({});   // id → name map (admin only)
-  const [mentor, setMentor] = useState(null);          // single mentor info for header
+  const [allMentors, setAllMentors] = useState({});
+  const [mentor, setMentor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -66,6 +63,7 @@ const SessionsPage = () => {
 
   const fetchSessions = async () => {
     try {
+      // Always pass mentor_id for non-admins — backend returns only their sessions
       const params = effectiveMentorId ? { mentor_id: effectiveMentorId } : {};
       const response = await sessionApi.getAll(params);
       setSessions(response.data);
@@ -105,9 +103,11 @@ const SessionsPage = () => {
 
     if (!uploadForm.video) { setUploadError('Please select a video file'); return; }
 
-    // For non-admins the mentor is always their own; guard just in case
     const mentorIdToUse = isAdmin ? uploadForm.selectedMentorId : effectiveMentorId;
-    if (!mentorIdToUse) { setUploadError('No mentor profile found. Please log out and log in again.'); return; }
+    if (!mentorIdToUse) {
+      setUploadError('No mentor profile found. Please log out and log in again.');
+      return;
+    }
 
     const validTypes = ['video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska'];
     if (!validTypes.includes(uploadForm.video.type)) {
@@ -217,7 +217,8 @@ const SessionsPage = () => {
   };
 
   const filteredSessions = sessions.filter(session => {
-    const matchesSearch = session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       session.topic.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = filterStatus === 'all' || session.status === filterStatus;
     return matchesSearch && matchesFilter;
@@ -256,13 +257,21 @@ const SessionsPage = () => {
               </button>
             </div>
           </div>
-          <div className="flex items-center gap-4 text-sm text-gray-400 mb-4 cursor-pointer" onClick={() => navigate(`/dashboard/sessions/${sessionIdStr}`)}>
+
+          <div
+            className="flex items-center gap-4 text-sm text-gray-400 mb-4 cursor-pointer"
+            onClick={() => navigate(`/dashboard/sessions/${sessionIdStr}`)}
+          >
             <div className="flex items-center gap-1"><Clock className="w-4 h-4" /><span>{formatDuration(session.duration)}</span></div>
             <div className="flex items-center gap-1"><Calendar className="w-4 h-4" /><span>{formatDate(session.created_at)}</span></div>
           </div>
-          {/* Show mentor name for admins who see all sessions */}
+
+          {/* Show mentor name only for admins viewing all sessions */}
           {isAdmin && allMentors[session.mentor_id] && (
-            <div className="pt-3 border-t border-white/10 flex items-center gap-2 cursor-pointer" onClick={() => navigate(`/dashboard/sessions/${sessionIdStr}`)}>
+            <div
+              className="pt-3 border-t border-white/10 flex items-center gap-2 cursor-pointer"
+              onClick={() => navigate(`/dashboard/sessions/${sessionIdStr}`)}
+            >
               <User className="w-4 h-4 text-gray-500" />
               <span className="text-sm text-gray-300">{allMentors[session.mentor_id]}</span>
             </div>
@@ -282,6 +291,7 @@ const SessionsPage = () => {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -292,11 +302,13 @@ const SessionsPage = () => {
               </button>
             )}
             <h1 className="text-3xl font-bold text-white tracking-tight">
-              {mentor ? `${mentor.name}'s Sessions` : 'My Sessions'}
+              {mentor ? `${mentor.name}'s Sessions` : isAdmin ? 'All Sessions' : 'My Sessions'}
             </h1>
           </div>
-          <p className="text-gray-400 ml-0">
-            {isAdmin ? 'Upload and manage teaching session videos' : `Showing sessions for ${mentor?.name || 'your profile'}`}
+          <p className="text-gray-400">
+            {isAdmin
+              ? 'Upload and manage teaching session videos'
+              : `Showing sessions for ${mentor?.name || 'your profile'}`}
           </p>
         </div>
         <button
@@ -346,17 +358,26 @@ const SessionsPage = () => {
       {filteredSessions.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <Video className="w-16 h-16 mx-auto text-gray-600 mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">{searchQuery || filterStatus !== 'all' ? 'No sessions found' : 'No sessions yet'}</h3>
-          <p className="text-gray-400 mb-6">{searchQuery || filterStatus !== 'all' ? 'Try adjusting your filters' : 'Upload your first teaching session to get started'}</p>
+          <h3 className="text-xl font-bold text-white mb-2">
+            {searchQuery || filterStatus !== 'all' ? 'No sessions found' : 'No sessions yet'}
+          </h3>
+          <p className="text-gray-400 mb-6">
+            {searchQuery || filterStatus !== 'all' ? 'Try adjusting your filters' : 'Upload your first teaching session to get started'}
+          </p>
           {!searchQuery && filterStatus === 'all' && (
-            <button onClick={() => setShowUploadModal(true)} className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors">
+            <button
+              onClick={() => setShowUploadModal(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+            >
               <Upload className="w-5 h-5" />Upload Session
             </button>
           )}
         </GlassCard>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSessions.map((session) => <SessionCard key={session.id || session._id} session={session} />)}
+          {filteredSessions.map((session) => (
+            <SessionCard key={session.id || session._id} session={session} />
+          ))}
         </div>
       )}
 
@@ -373,11 +394,14 @@ const SessionsPage = () => {
             }}
           />
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
-            <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl pointer-events-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2 className="text-2xl font-bold text-white mb-6">Upload Teaching Session</h2>
               <form onSubmit={handleUploadSession} className="space-y-4">
 
-                {/* ── Mentor selector: admins only ─────────────────────── */}
+                {/* Mentor: selector for admins, locked badge for faculty */}
                 {isAdmin ? (
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Select Mentor *</label>
@@ -395,7 +419,6 @@ const SessionsPage = () => {
                     </select>
                   </div>
                 ) : (
-                  /* Non-admin: show locked mentor badge */
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Mentor</label>
                     <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl">
@@ -413,7 +436,8 @@ const SessionsPage = () => {
                 {/* Title */}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Session Title *</label>
-                  <input type="text" required value={uploadForm.title}
+                  <input
+                    type="text" required value={uploadForm.title}
                     onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
                     placeholder="e.g., Python Decorators Explained"
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
@@ -423,7 +447,8 @@ const SessionsPage = () => {
                 {/* Topic */}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Topic *</label>
-                  <input type="text" required value={uploadForm.topic}
+                  <input
+                    type="text" required value={uploadForm.topic}
                     onChange={(e) => setUploadForm({ ...uploadForm, topic: e.target.value })}
                     placeholder="e.g., Python Programming"
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
@@ -433,7 +458,8 @@ const SessionsPage = () => {
                 {/* File */}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Video File *</label>
-                  <input type="file" required
+                  <input
+                    type="file" required
                     accept="video/mp4,video/mpeg,video/quicktime,video/x-msvideo,video/x-matroska"
                     onChange={(e) => setUploadForm({ ...uploadForm, video: e.target.files[0] })}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30 cursor-pointer transition-all"
@@ -472,11 +498,14 @@ const SessionsPage = () => {
                 )}
 
                 {uploadError && (
-                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">{uploadError}</div>
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
+                    {uploadError}
+                  </div>
                 )}
 
                 <div className="flex gap-3 mt-6">
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => {
                       if (uploading) return;
                       setShowUploadModal(false);
@@ -488,7 +517,9 @@ const SessionsPage = () => {
                   >
                     {uploading ? 'Please wait...' : 'Cancel'}
                   </button>
-                  <button type="submit" disabled={uploading || !uploadForm.video}
+                  <button
+                    type="submit"
+                    disabled={uploading || !uploadForm.video}
                     className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50"
                   >
                     {uploading ? (
@@ -508,9 +539,15 @@ const SessionsPage = () => {
       {/* ── Delete Modal ──────────────────────────────────────────────────── */}
       {showDeleteModal && (
         <>
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]" onClick={() => { setShowDeleteModal(false); setSessionToDelete(null); }} />
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]"
+            onClick={() => { setShowDeleteModal(false); setSessionToDelete(null); }}
+          />
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
-            <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl pointer-events-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-start gap-4 mb-6">
                 <div className="p-3 bg-red-500/20 rounded-xl"><Trash2 className="w-6 h-6 text-red-400" /></div>
                 <div>
@@ -519,9 +556,21 @@ const SessionsPage = () => {
                 </div>
               </div>
               <div className="flex gap-3">
-                <button onClick={() => { setShowDeleteModal(false); setSessionToDelete(null); }} disabled={!!deletingSession} className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all font-medium disabled:opacity-50">Cancel</button>
-                <button onClick={handleDeleteSession} disabled={!!deletingSession} className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50 flex items-center justify-center gap-2">
-                  {deletingSession ? <><Loader className="w-4 h-4 animate-spin" />Deleting...</> : <><Trash2 className="w-4 h-4" />Delete</>}
+                <button
+                  onClick={() => { setShowDeleteModal(false); setSessionToDelete(null); }}
+                  disabled={!!deletingSession}
+                  className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all font-medium disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteSession}
+                  disabled={!!deletingSession}
+                  className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {deletingSession
+                    ? <><Loader className="w-4 h-4 animate-spin" />Deleting...</>
+                    : <><Trash2 className="w-4 h-4" />Delete</>}
                 </button>
               </div>
             </div>
