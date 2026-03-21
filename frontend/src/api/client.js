@@ -1,4 +1,4 @@
-// frontend/src/api/client.js  (FULL REPLACEMENT)
+// frontend/src/api/client.js
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://parthg2209-fathom.hf.space';
@@ -36,8 +36,16 @@ apiClient.interceptors.response.use(
 
 // ── Mentor APIs ────────────────────────────────────────────────────────────────
 export const mentorApi = {
-  getAll: () => apiClient.get('/api/mentors'),
+  getAll: (params) => apiClient.get('/api/mentors', { params }),
   getById: (id) => apiClient.get(`/api/mentors/${id}`),
+  /** Find the mentor record owned by a specific Firebase UID */
+  getByOwner: (ownerUid) => apiClient.get('/api/mentors', { params: { owner_uid: ownerUid } }).then(res => {
+    // The backend returns an array; we want the first match
+    const list = Array.isArray(res.data) ? res.data : [];
+    const found = list.find(m => m.owner_uid === ownerUid);
+    if (found) return { data: found };
+    throw new Error('No mentor found for this owner');
+  }),
   create: (data) => apiClient.post('/api/mentors', data),
   update: (id, data) => apiClient.put(`/api/mentors/${id}`, data),
   delete: (id) => apiClient.delete(`/api/mentors/${id}`),
@@ -69,33 +77,10 @@ export const evaluationApi = {
 
 // ── Access Code APIs ───────────────────────────────────────────────────────────
 export const accessCodeApi = {
-  /**
-   * Admin: Save a newly generated code hash to the database.
-   * payload: { institution_name: string, code_hash: string, description?: string }
-   */
   create: (payload) => apiClient.post('/api/access-codes', payload),
-
-  /**
-   * Faculty login: Verify that a code hash is valid and (optionally) bind it
-   * to the current Firebase user.
-   * payload: { code_hash: string, user_uid?: string }
-   * Returns: { valid: boolean, institution_name: string|null, message: string }
-   */
   verify: (payload) => apiClient.post('/api/access-codes/verify', payload),
-
-  /**
-   * Admin: List all access codes (hashes are never returned).
-   */
   getAll: () => apiClient.get('/api/access-codes'),
-
-  /**
-   * Admin: Deactivate (revoke) an access code without deleting it.
-   */
   deactivate: (codeId) => apiClient.patch(`/api/access-codes/${codeId}/deactivate`),
-
-  /**
-   * Admin: Permanently delete an access code.
-   */
   delete: (codeId) => apiClient.delete(`/api/access-codes/${codeId}`),
 };
 
