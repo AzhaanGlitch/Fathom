@@ -1,20 +1,34 @@
+// frontend/src/pages/Dashboard/SessionsPage.jsx
+// KEY CHANGES:
+//  - Non-admin users (solo-faculty / institution-faculty) have their mentorId from localStorage
+//    pre-filled and locked — no mentor selector shown.
+//  - Sessions list is also scoped to that mentorId automatically.
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import {
   Upload, Video, ArrowLeft, Search,
-  Clock, Calendar, CheckCircle, Loader, XCircle, User, Trash2
+  Clock, Calendar, CheckCircle, Loader, XCircle, User, Trash2, Lock
 } from 'lucide-react';
 import { sessionApi, mentorApi } from '../../api/client';
 
 const SessionsPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const mentorId = searchParams.get('mentor');
+  const urlMentorId = searchParams.get('mentor');
+
+  // ── Role / identity from localStorage ─────────────────────────────────────
+  const userRole = localStorage.getItem('userRole') || 'institution-faculty';
+  const isAdmin = userRole === 'admin';
+  const storedMentorId = localStorage.getItem('mentorId'); // set at login for non-admins
+
+  // For non-admins always scope to their own mentor; for admins use URL param if present
+  const effectiveMentorId = isAdmin ? (urlMentorId || null) : storedMentorId;
 
   const [sessions, setSessions] = useState([]);
-  const [allMentors, setAllMentors] = useState({});
-  const [mentor, setMentor] = useState(null);
+  const [allMentors, setAllMentors] = useState({});   // id → name map (admin only)
+  const [mentor, setMentor] = useState(null);          // single mentor info for header
   const [loading, setLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -26,26 +40,33 @@ const SessionsPage = () => {
   const [deletingSession, setDeletingSession] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState(null);
+
   const [uploadForm, setUploadForm] = useState({
     title: '',
     topic: '',
     video: null,
-    selectedMentorId: mentorId || '',
+    selectedMentorId: effectiveMentorId || '',
   });
 
+  // ── Data fetching ──────────────────────────────────────────────────────────
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchSessions, 5000);
     return () => clearInterval(interval);
-  }, [mentorId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectiveMentorId]);
 
   const fetchData = async () => {
-    await Promise.all([fetchSessions(), fetchAllMentors(), mentorId && fetchMentor()]);
+    await Promise.all([
+      fetchSessions(),
+      isAdmin && fetchAllMentors(),
+      effectiveMentorId && fetchMentor(effectiveMentorId),
+    ].filter(Boolean));
   };
 
   const fetchSessions = async () => {
     try {
-      const params = mentorId ? { mentor_id: mentorId } : {};
+      const params = effectiveMentorId ? { mentor_id: effectiveMentorId } : {};
       const response = await sessionApi.getAll(params);
       setSessions(response.data);
     } catch (error) {
@@ -55,10 +76,9 @@ const SessionsPage = () => {
     }
   };
 
-  const fetchMentor = async () => {
-    if (!mentorId) return;
+  const fetchMentor = async (id) => {
     try {
-      const response = await mentorApi.getById(mentorId);
+      const response = await mentorApi.getById(id);
       setMentor(response.data);
     } catch (error) {
       console.error('Error fetching mentor:', error);
@@ -79,26 +99,22 @@ const SessionsPage = () => {
     }
   };
 
+  // ── Upload ─────────────────────────────────────────────────────────────────
   const handleUploadSession = async (e) => {
     e.preventDefault();
 
-    if (!uploadForm.video) {
-      setUploadError('Please select a video file');
-      return;
-    }
-    if (!uploadForm.selectedMentorId) {
-      setUploadError('Please select a mentor');
-      return;
-    }
+    if (!uploadForm.video) { setUploadError('Please select a video file'); return; }
+
+    // For non-admins the mentor is always their own; guard just in case
+    const mentorIdToUse = isAdmin ? uploadForm.selectedMentorId : effectiveMentorId;
+    if (!mentorIdToUse) { setUploadError('No mentor profile found. Please log out and log in again.'); return; }
 
     const validTypes = ['video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska'];
     if (!validTypes.includes(uploadForm.video.type)) {
       setUploadError('Please select a valid video file (MP4, MOV, AVI, MKV)');
       return;
     }
-
-    const maxSize = 500 * 1024 * 1024;
-    if (uploadForm.video.size > maxSize) {
+    if (uploadForm.video.size > 500 * 1024 * 1024) {
       setUploadError('Video file is too large. Maximum size is 500MB');
       return;
     }
@@ -110,30 +126,25 @@ const SessionsPage = () => {
       setUploadPhase('uploading');
 
       const formData = new FormData();
-      formData.append('mentor_id', uploadForm.selectedMentorId);
+      formData.append('mentor_id', mentorIdToUse);
       formData.append('title', uploadForm.title);
       formData.append('topic', uploadForm.topic);
       formData.append('video', uploadForm.video);
 
       const API_BASE = process.env.REACT_APP_API_URL || 'https://parthg2209-fathom.hf.space';
-
-      const response = await axios.post(
-        `${API_BASE}/api/sessions`,
-        formData,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          timeout: 300000,
-          onUploadProgress: (progressEvent) => {
-            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(percent);
-            if (percent === 100) setUploadPhase('processing');
-          },
-        }
-      );
+      const response = await axios.post(`${API_BASE}/api/sessions`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 300000,
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percent);
+          if (percent === 100) setUploadPhase('processing');
+        },
+      });
 
       if (response.data && response.data.id) {
         setShowUploadModal(false);
-        setUploadForm({ title: '', topic: '', video: null, selectedMentorId: mentorId || '' });
+        setUploadForm({ title: '', topic: '', video: null, selectedMentorId: effectiveMentorId || '' });
         setUploadError('');
         setUploadProgress(0);
         setUploadPhase('');
@@ -158,6 +169,7 @@ const SessionsPage = () => {
     }
   };
 
+  // ── Delete ─────────────────────────────────────────────────────────────────
   const handleDeleteSession = async () => {
     if (!sessionToDelete) return;
     try {
@@ -180,6 +192,7 @@ const SessionsPage = () => {
     setShowDeleteModal(true);
   };
 
+  // ── Helpers ────────────────────────────────────────────────────────────────
   const getStatusConfig = (status) => {
     const configs = {
       uploaded: { icon: Video, text: 'Uploaded', bgColor: 'bg-gray-500/10', textColor: 'text-gray-400', borderColor: 'border-gray-500/20' },
@@ -210,7 +223,7 @@ const SessionsPage = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const GlassCard = ({ children, className = "" }) => (
+  const GlassCard = ({ children, className = '' }) => (
     <div className={`bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
       {children}
     </div>
@@ -223,7 +236,7 @@ const SessionsPage = () => {
 
     return (
       <div className="group bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl group-hover:opacity-100 opacity-0 transition-opacity" />
         <div className="relative z-10">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1 cursor-pointer" onClick={() => navigate(`/dashboard/sessions/${sessionIdStr}`)}>
@@ -247,7 +260,8 @@ const SessionsPage = () => {
             <div className="flex items-center gap-1"><Clock className="w-4 h-4" /><span>{formatDuration(session.duration)}</span></div>
             <div className="flex items-center gap-1"><Calendar className="w-4 h-4" /><span>{formatDate(session.created_at)}</span></div>
           </div>
-          {allMentors[session.mentor_id] && (
+          {/* Show mentor name for admins who see all sessions */}
+          {isAdmin && allMentors[session.mentor_id] && (
             <div className="pt-3 border-t border-white/10 flex items-center gap-2 cursor-pointer" onClick={() => navigate(`/dashboard/sessions/${sessionIdStr}`)}>
               <User className="w-4 h-4 text-gray-500" />
               <span className="text-sm text-gray-300">{allMentors[session.mentor_id]}</span>
@@ -261,7 +275,7 @@ const SessionsPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
       </div>
     );
   }
@@ -272,16 +286,18 @@ const SessionsPage = () => {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            {mentorId && (
+            {isAdmin && urlMentorId && (
               <button onClick={() => navigate('/dashboard/mentors')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
                 <ArrowLeft className="w-5 h-5 text-gray-400 hover:text-white" />
               </button>
             )}
             <h1 className="text-3xl font-bold text-white tracking-tight">
-              {mentor ? `${mentor.name}'s Sessions` : 'All Sessions'}
+              {mentor ? `${mentor.name}'s Sessions` : 'My Sessions'}
             </h1>
           </div>
-          <p className="text-gray-400 ml-14">Upload and manage teaching session videos</p>
+          <p className="text-gray-400 ml-0">
+            {isAdmin ? 'Upload and manage teaching session videos' : `Showing sessions for ${mentor?.name || 'your profile'}`}
+          </p>
         </div>
         <button
           onClick={() => setShowUploadModal(true)}
@@ -344,7 +360,7 @@ const SessionsPage = () => {
         </div>
       )}
 
-      {/* Upload Modal */}
+      {/* ── Upload Modal ──────────────────────────────────────────────────── */}
       {showUploadModal && (
         <>
           <div
@@ -352,7 +368,7 @@ const SessionsPage = () => {
             onClick={() => {
               if (uploading) return;
               setShowUploadModal(false);
-              setUploadForm({ title: '', topic: '', video: null, selectedMentorId: mentorId || '' });
+              setUploadForm({ title: '', topic: '', video: null, selectedMentorId: effectiveMentorId || '' });
               setUploadError('');
             }}
           />
@@ -361,29 +377,43 @@ const SessionsPage = () => {
               <h2 className="text-2xl font-bold text-white mb-6">Upload Teaching Session</h2>
               <form onSubmit={handleUploadSession} className="space-y-4">
 
-                {/* Mentor Select */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Select Mentor *</label>
-                  <select
-                    required
-                    value={uploadForm.selectedMentorId}
-                    onChange={(e) => setUploadForm({ ...uploadForm, selectedMentorId: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-900 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-                    style={{ colorScheme: 'dark' }}
-                  >
-                    <option value="">Choose a mentor...</option>
-                    {Object.entries(allMentors).map(([id, name]) => (
-                      <option key={id} value={id}>{name}</option>
-                    ))}
-                  </select>
-                </div>
+                {/* ── Mentor selector: admins only ─────────────────────── */}
+                {isAdmin ? (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Select Mentor *</label>
+                    <select
+                      required
+                      value={uploadForm.selectedMentorId}
+                      onChange={(e) => setUploadForm({ ...uploadForm, selectedMentorId: e.target.value })}
+                      className="w-full px-4 py-3 bg-gray-900 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                      style={{ colorScheme: 'dark' }}
+                    >
+                      <option value="">Choose a mentor...</option>
+                      {Object.entries(allMentors).map(([id, name]) => (
+                        <option key={id} value={id}>{name}</option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  /* Non-admin: show locked mentor badge */
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Mentor</label>
+                    <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl">
+                      <User className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                      <span className="text-white font-medium flex-1">{mentor?.name || 'Your profile'}</span>
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                        <Lock className="w-3 h-3 text-blue-400" />
+                        <span className="text-xs text-blue-400 font-medium">Auto-assigned</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1.5">Sessions are automatically linked to your faculty profile.</p>
+                  </div>
+                )}
 
                 {/* Title */}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Session Title *</label>
-                  <input
-                    type="text" required
-                    value={uploadForm.title}
+                  <input type="text" required value={uploadForm.title}
                     onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
                     placeholder="e.g., Python Decorators Explained"
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
@@ -393,20 +423,17 @@ const SessionsPage = () => {
                 {/* Topic */}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Topic *</label>
-                  <input
-                    type="text" required
-                    value={uploadForm.topic}
+                  <input type="text" required value={uploadForm.topic}
                     onChange={(e) => setUploadForm({ ...uploadForm, topic: e.target.value })}
                     placeholder="e.g., Python Programming"
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                   />
                 </div>
 
-                {/* File Input */}
+                {/* File */}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Video File *</label>
-                  <input
-                    type="file" required
+                  <input type="file" required
                     accept="video/mp4,video/mpeg,video/quicktime,video/x-msvideo,video/x-matroska"
                     onChange={(e) => setUploadForm({ ...uploadForm, video: e.target.files[0] })}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30 cursor-pointer transition-all"
@@ -420,7 +447,7 @@ const SessionsPage = () => {
                   <p className="text-xs text-gray-500 mt-2">Supported: MP4, MOV, AVI, MKV (Max 500MB)</p>
                 </div>
 
-                {/* Progress Bar */}
+                {/* Progress */}
                 {uploading && (
                   <div className="w-full space-y-2">
                     <div className="flex justify-between text-xs text-gray-400">
@@ -432,34 +459,28 @@ const SessionsPage = () => {
                         className="h-2.5 rounded-full transition-all duration-300 ease-out"
                         style={{
                           width: uploadPhase === 'processing' ? '100%' : `${uploadProgress}%`,
-                          backgroundColor: uploadPhase === 'processing' ? '#facc15' : '#3b82f6'
+                          backgroundColor: uploadPhase === 'processing' ? '#facc15' : '#3b82f6',
                         }}
                       />
                     </div>
                     <p className="text-xs text-center">
                       {uploadPhase === 'processing'
                         ? <span className="text-yellow-400">⚙️ File received — saving to server. Please wait...</span>
-                        : <span className="text-blue-400">📤 Sending file to server...</span>
-                      }
+                        : <span className="text-blue-400">📤 Sending file to server...</span>}
                     </p>
                   </div>
                 )}
 
-                {/* Error */}
                 {uploadError && (
-                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
-                    {uploadError}
-                  </div>
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">{uploadError}</div>
                 )}
 
-                {/* Buttons */}
                 <div className="flex gap-3 mt-6">
-                  <button
-                    type="button"
+                  <button type="button"
                     onClick={() => {
                       if (uploading) return;
                       setShowUploadModal(false);
-                      setUploadForm({ title: '', topic: '', video: null, selectedMentorId: mentorId || '' });
+                      setUploadForm({ title: '', topic: '', video: null, selectedMentorId: effectiveMentorId || '' });
                       setUploadError('');
                     }}
                     disabled={uploading}
@@ -467,9 +488,7 @@ const SessionsPage = () => {
                   >
                     {uploading ? 'Please wait...' : 'Cancel'}
                   </button>
-                  <button
-                    type="submit"
-                    disabled={uploading || !uploadForm.video}
+                  <button type="submit" disabled={uploading || !uploadForm.video}
                     className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50"
                   >
                     {uploading ? (
@@ -480,14 +499,13 @@ const SessionsPage = () => {
                     ) : 'Upload'}
                   </button>
                 </div>
-
               </form>
             </div>
           </div>
         </>
       )}
 
-      {/* Delete Modal */}
+      {/* ── Delete Modal ──────────────────────────────────────────────────── */}
       {showDeleteModal && (
         <>
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]" onClick={() => { setShowDeleteModal(false); setSessionToDelete(null); }} />
