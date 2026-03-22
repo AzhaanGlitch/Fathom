@@ -1,6 +1,7 @@
 import React from "react";
-import { Award } from "lucide-react";
+import { Award, Sun, Moon } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { useTheme } from "../../contexts/ThemeContext.jsx";
 
 export const Footer = ({
   brandName = "Fathom",
@@ -12,6 +13,8 @@ export const Footer = ({
   brandIcon,
   className,
 }) => {
+  const { darkMode, toggleDarkMode } = useTheme();
+
   return (
     <section className={cn("relative w-full mt-0 overflow-hidden", className)}>
       <footer className="bg-transparent mt-20 relative transition-colors duration-300">
@@ -71,7 +74,7 @@ export const Footer = ({
               ©{new Date().getFullYear()} {brandName}. All rights reserved.
             </p>
             {creatorName && creatorUrl && (
-              <nav className="flex gap-4">
+              <nav className="flex items-center gap-4">
                 <a
                   href={creatorUrl}
                   target="_blank"
@@ -80,6 +83,18 @@ export const Footer = ({
                 >
                   Crafted by {creatorName}
                 </a>
+
+                {/* Theme Toggle Button */}
+                <button
+                  onClick={toggleDarkMode}
+                  className={`p-2 rounded-full transition-all shadow-md ml-4 ${darkMode
+                      ? 'bg-white/10 text-white hover:bg-white/20'
+                      : 'bg-black/5 text-gray-900 hover:bg-black/10'
+                    }`}
+                  aria-label="Toggle Theme"
+                >
+                  {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
               </nav>
             )}
           </div>
