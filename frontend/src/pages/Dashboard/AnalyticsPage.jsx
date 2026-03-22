@@ -49,7 +49,16 @@ const AnalyticsPage = () => {
           sessionApi.getAll(),
           evaluationApi.getAll(),
         ]);
-        buildAnalytics(mentorsRes.data, sessionsRes.data, evaluationsRes.data);
+        // Exclude solo-faculty from admin view
+        const validMentors = mentorsRes.data.filter(m => m.role !== 'solo-faculty');
+        const validMentorIds = new Set(validMentors.map(m => m.id || m._id));
+        const validSessions = sessionsRes.data.filter(s => validMentorIds.has(s.mentor_id));
+        
+        // For evaluations, map back to valid sessions
+        const validSessionIds = new Set(validSessions.map(s => s.id || s._id));
+        const validEvaluations = evaluationsRes.data.filter(e => validSessionIds.has(e.session_id));
+
+        buildAnalytics(validMentors, validSessions, validEvaluations);
       } else {
         // ── Faculty: own data only ────────────────────────────────────────
         if (!storedMentorId) { setLoading(false); return; }
@@ -267,13 +276,13 @@ const AnalyticsPage = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={analyticsData.sessionsByStatus}
+                data={analyticsData.sessionsByStatus.filter(s => s.value > 0)}
                 cx="50%" cy="50%"
                 innerRadius={60} outerRadius={100}
                 paddingAngle={5} dataKey="value"
                 label={(entry) => `${entry.name}: ${entry.value}`}
               >
-                {analyticsData.sessionsByStatus.map((entry, index) => (
+                {analyticsData.sessionsByStatus.filter(s => s.value > 0).map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -295,7 +304,7 @@ const AnalyticsPage = () => {
               <Users className="w-6 h-6 text-green-400" />
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={analyticsData.mentorPerformance} layout="horizontal">
+              <BarChart data={analyticsData.mentorPerformance} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                 <XAxis type="number" stroke="rgba(255,255,255,0.3)" />
                 <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.3)" />
