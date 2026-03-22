@@ -25,6 +25,7 @@ const SessionsPage = () => {
 
   const [sessions, setSessions] = useState([]);
   const [allMentors, setAllMentors] = useState({});
+  const [soloMentorIds, setSoloMentorIds] = useState(new Set());
   const [mentor, setMentor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -87,11 +88,17 @@ const SessionsPage = () => {
     try {
       const response = await mentorApi.getAll();
       const mentorsMap = {};
+      const solos = new Set();
       response.data.forEach(m => {
         const id = m.id || m._id;
-        mentorsMap[id] = m.name;
+        if (m.role === 'solo-faculty') {
+          solos.add(id);
+        } else {
+          mentorsMap[id] = m.name;
+        }
       });
       setAllMentors(mentorsMap);
+      setSoloMentorIds(solos);
     } catch (error) {
       console.error('Error fetching all mentors:', error);
     }
@@ -142,7 +149,7 @@ const SessionsPage = () => {
         },
       });
 
-      if (response.data && response.data.id) {
+      if (response.status >= 200 && response.status < 300) {
         setShowUploadModal(false);
         setUploadForm({ title: '', topic: '', video: null, selectedMentorId: effectiveMentorId || '' });
         setUploadError('');
@@ -217,6 +224,9 @@ const SessionsPage = () => {
   };
 
   const filteredSessions = sessions.filter(session => {
+    if (isAdmin && !effectiveMentorId && soloMentorIds.has(session.mentor_id)) {
+      return false;
+    }
     const matchesSearch =
       session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       session.topic.toLowerCase().includes(searchQuery.toLowerCase());
@@ -491,8 +501,8 @@ const SessionsPage = () => {
                     </div>
                     <p className="text-xs text-center">
                       {uploadPhase === 'processing'
-                        ? <span className="text-yellow-400">⚙️ File received — saving to server. Please wait...</span>
-                        : <span className="text-blue-400">📤 Sending file to server...</span>}
+                        ? <span className="text-yellow-400">File received — saving to server. Please wait...</span>
+                        : <span className="text-blue-400">Sending file to server...</span>}
                     </p>
                   </div>
                 )}
