@@ -44,7 +44,7 @@ const LandingPage = () => {
         }`}>
         <h1 className={`text-6xl md:text-[4rem] lg:text-[10rem] pt-40 leading-none tracking-tighter font-extrabold text-center relative z-20 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'
           }`}>
-          Fathom
+          FATHOM
         </h1>
         <div className="w-[90vw] max-w-[70rem] h-40 relative [mask-image:radial-gradient(350px_200px_at_top,white_20%,transparent)] [-webkit-mask-image:radial-gradient(350px_200px_at_top,white_20%,transparent)]">
           {/* Gradients */}
