@@ -128,7 +128,7 @@ const SessionDetailPage = () => {
       setDeleting(true);
       await sessionApi.delete(sessionId);
       setShowDeleteModal(false);
-      navigate(`/dashboard/sessions?mentor=${session.mentor_id}`);
+      navigate('/dashboard/sessions');
     } catch (error) {
       console.error('Error deleting session:', error);
       alert('Failed to delete session: ' + (error.response?.data?.detail || error.message));
@@ -225,7 +225,7 @@ const SessionDetailPage = () => {
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4 flex-1">
           <button
-            onClick={() => !isGlobalProcessing && navigate(`/dashboard/sessions?mentor=${session.mentor_id}`)}
+            onClick={() => !isGlobalProcessing && navigate(-1)}
             disabled={isGlobalProcessing}
             className={`p-2 rounded-lg transition-colors mt-1 backdrop-blur-sm ${
               isGlobalProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5'
