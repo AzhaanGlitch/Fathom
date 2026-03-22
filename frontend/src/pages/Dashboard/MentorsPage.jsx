@@ -32,7 +32,7 @@ const MentorsPage = () => {
     try {
       setLoading(true);
       const response = await mentorApi.getAll();
-      const mentorList = response.data;
+      const mentorList = response.data.filter(mentor => mentor.role !== 'solo-faculty');
 
       const normalizedMentors = mentorList.map(mentor => ({
         ...mentor,
