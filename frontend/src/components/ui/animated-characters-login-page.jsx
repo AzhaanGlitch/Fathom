@@ -1,8 +1,8 @@
 // frontend/src/components/ui/animated-characters-login-page.jsx
-// KEY CHANGES:
-//  1. Solo-faculty sign-up collects a "Faculty Name" and auto-creates a mentor record
-//  2. Institution-faculty login resolves the access code → uses institution_name as mentor name
-//  3. Both flows store mentorId in localStorage so the rest of the app uses it automatically
+// FIXES:
+//  1. Name / facultyName fields are ONLY shown during sign-up, never during login
+//  2. On login, we LOOK UP the existing mentor by owner_uid — we never create a new one
+//  3. Admin "All Sessions" link wired in DashboardLayout (separate file)
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "./button";
@@ -22,30 +22,37 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { accessCodeApi, mentorApi } from "../../api/client";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Helper: ensure a mentor record exists for this user; return its id
+// Helper: on SIGN-UP → create mentor if not existing
+// Helper: on LOGIN  → only look up, never create
 // ─────────────────────────────────────────────────────────────────────────────
-async function ensureMentorExists({ name, email, userUid, role, institutionName }) {
+async function findExistingMentor(userUid) {
   try {
-    // Ask the backend for a mentor tied to this Firebase UID
     const existing = await mentorApi.getByOwner(userUid);
-    if (existing?.data?.id) return existing.data.id;
-  } catch (_) {
-    // 404 or network — fall through to create
-  }
+    if (existing?.data?.id || existing?.data?._id) {
+      return existing.data.id || existing.data._id;
+    }
+  } catch (_) { }
+  return null;
+}
 
-  // Create a new mentor record owned by this user
+async function ensureMentorExists({ name, email, userUid, role, institutionName }) {
+  // First always try to find existing
+  const existingId = await findExistingMentor(userUid);
+  if (existingId) return existingId;
+
+  // Only create on sign-up (caller must pass a real name)
+  if (!name || !name.trim()) return null;
+
   const mentorName =
-    role === "institution-faculty"
-      ? institutionName || name
-      : name;
+    role === "institution-faculty" ? institutionName || name : name;
 
   const res = await mentorApi.create({
     name: mentorName,
-    email: email,
+    email,
     expertise: [],
     bio: "",
     owner_uid: userUid,
-    role: role,
+    role,
     institution_name: role === "institution-faculty" ? institutionName : undefined,
   });
   return res.data.id || res.data._id;
@@ -188,8 +195,8 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [name, setName] = useState("");
-  const [facultyName, setFacultyName] = useState(""); // solo faculty display name
+  const [name, setName] = useState("");           // admin / institution-faculty signup name
+  const [facultyName, setFacultyName] = useState(""); // solo faculty signup name
   const [institutionCode, setInstitutionCode] = useState("");
   const [institutionName, setInstitutionName] = useState(""); // admin sign-up
   const [adminCode, setAdminCode] = useState("");
@@ -334,7 +341,7 @@ function LoginPage() {
         throw new Error("Invalid administration access code.");
       }
 
-      // Institution faculty: validate code
+      // Institution faculty: validate code on sign-up or if code provided
       if (activeRole === "institution-faculty" && institutionCode.trim()) {
         if (codeValidation === "invalid") {
           throw new Error(codeValidationMsg || "Invalid institution access code.");
@@ -351,7 +358,7 @@ function LoginPage() {
         }
       }
 
-      // Solo faculty: name required on sign-up
+      // Solo faculty sign-up: name required
       if (activeRole === "solo-faculty" && isSignUp && !facultyName.trim()) {
         throw new Error("Please enter your faculty name.");
       }
@@ -361,7 +368,10 @@ function LoginPage() {
       if (isSignUp) {
         if (password !== confirmPassword) throw new Error("Passwords do not match.");
         userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(userCredential.user, { displayName: name || facultyName });
+        const displayName = activeRole === "solo-faculty" ? facultyName.trim() : name.trim();
+        if (displayName) {
+          await updateProfile(userCredential.user, { displayName });
+        }
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
@@ -375,25 +385,35 @@ function LoginPage() {
         } catch { /* best-effort */ }
       }
 
-      // ── Auto-create / find mentor for non-admin roles ─────────────────────
+      // ── Mentor lookup / creation ──────────────────────────────────────────
+      // LOGIN:  only look up — never create a duplicate with a different name
+      // SIGNUP: create if not found
       let mentorId = null;
       if (activeRole !== "admin") {
-        const resolvedName =
-          activeRole === "institution-faculty"
-            ? (verifiedInstitution || institutionCode.trim())
-            : facultyName.trim() || userCredential.user.displayName || email.split("@")[0];
+        if (isSignUp) {
+          const resolvedName =
+            activeRole === "institution-faculty"
+              ? (verifiedInstitution || name.trim() || email.split("@")[0])
+              : (facultyName.trim() || email.split("@")[0]);
 
-        try {
-          mentorId = await ensureMentorExists({
-            name: resolvedName,
-            email: userCredential.user.email,
-            userUid: uid,
-            role: activeRole,
-            institutionName: activeRole === "institution-faculty" ? verifiedInstitution : undefined,
-          });
-        } catch (mentorErr) {
-          console.error("Failed to create/find mentor:", mentorErr);
-          // Non-fatal — the user can still log in; sessions just won't be pre-linked
+          try {
+            mentorId = await ensureMentorExists({
+              name: resolvedName,
+              email: userCredential.user.email,
+              userUid: uid,
+              role: activeRole,
+              institutionName: activeRole === "institution-faculty" ? verifiedInstitution : undefined,
+            });
+          } catch (mentorErr) {
+            console.error("Failed to create/find mentor:", mentorErr);
+          }
+        } else {
+          // Login: strictly look up, don't create
+          try {
+            mentorId = await findExistingMentor(uid);
+          } catch (mentorErr) {
+            console.error("Failed to find mentor:", mentorErr);
+          }
         }
       }
 
@@ -402,8 +422,13 @@ function LoginPage() {
       localStorage.setItem("userId", uid);
       if (mentorId) localStorage.setItem("mentorId", mentorId);
       if (verifiedInstitution) localStorage.setItem("institutionName", verifiedInstitution);
-      if (activeRole === "solo-faculty" && facultyName.trim()) {
+      if (activeRole === "solo-faculty" && isSignUp && facultyName.trim()) {
         localStorage.setItem("facultyName", facultyName.trim());
+      }
+      // On login, restore facultyName from Firebase profile if available
+      if (!isSignUp && activeRole === "solo-faculty") {
+        const displayName = userCredential.user.displayName;
+        if (displayName) localStorage.setItem("facultyName", displayName);
       }
 
       const defaultRoute = activeRole === "admin" ? "/dashboard/analytics" : "/dashboard";
@@ -429,6 +454,7 @@ function LoginPage() {
 
       const userCredential = await signInWithPopup(auth, googleProvider);
       const uid = userCredential.user.uid;
+      const isNewUser = userCredential._tokenResponse?.isNewUser || false;
 
       if (activeRole === "institution-faculty" && institutionCode.trim() && codeValidation === "valid") {
         try { await accessCodeApi.verify({ code_hash: institutionCode.trim(), user_uid: uid }); } catch { }
@@ -436,21 +462,42 @@ function LoginPage() {
 
       let mentorId = null;
       if (activeRole !== "admin") {
-        const resolvedName =
-          activeRole === "institution-faculty"
-            ? (verifiedInstitution || userCredential.user.displayName || email.split("@")[0])
-            : facultyName.trim() || userCredential.user.displayName || userCredential.user.email.split("@")[0];
+        if (isNewUser || isSignUp) {
+          // New Google user: create mentor
+          const resolvedName =
+            activeRole === "institution-faculty"
+              ? (verifiedInstitution || userCredential.user.displayName || email.split("@")[0])
+              : (facultyName.trim() || userCredential.user.displayName || userCredential.user.email.split("@")[0]);
 
-        try {
-          mentorId = await ensureMentorExists({
-            name: resolvedName,
-            email: userCredential.user.email,
-            userUid: uid,
-            role: activeRole,
-            institutionName: activeRole === "institution-faculty" ? verifiedInstitution : undefined,
-          });
-        } catch (mentorErr) {
-          console.error("Failed to create/find mentor:", mentorErr);
+          try {
+            mentorId = await ensureMentorExists({
+              name: resolvedName,
+              email: userCredential.user.email,
+              userUid: uid,
+              role: activeRole,
+              institutionName: activeRole === "institution-faculty" ? verifiedInstitution : undefined,
+            });
+          } catch (mentorErr) {
+            console.error("Failed to create/find mentor:", mentorErr);
+          }
+        } else {
+          // Returning Google user: look up only
+          try {
+            mentorId = await findExistingMentor(uid);
+            // If not found still try ensureCreate as fallback for existing Google accounts
+            if (!mentorId) {
+              const resolvedName = userCredential.user.displayName || userCredential.user.email.split("@")[0];
+              mentorId = await ensureMentorExists({
+                name: resolvedName,
+                email: userCredential.user.email,
+                userUid: uid,
+                role: activeRole,
+                institutionName: activeRole === "institution-faculty" ? verifiedInstitution : undefined,
+              });
+            }
+          } catch (mentorErr) {
+            console.error("Failed to find mentor:", mentorErr);
+          }
         }
       }
 
@@ -459,6 +506,9 @@ function LoginPage() {
       if (mentorId) localStorage.setItem("mentorId", mentorId);
       if (verifiedInstitution) localStorage.setItem("institutionName", verifiedInstitution);
       if (activeRole === "solo-faculty" && facultyName.trim()) localStorage.setItem("facultyName", facultyName.trim());
+      if (!facultyName.trim() && userCredential.user.displayName) {
+        localStorage.setItem("facultyName", userCredential.user.displayName);
+      }
 
       const defaultRoute = activeRole === "admin" ? "/dashboard/analytics" : "/dashboard";
       navigate(defaultRoute);
@@ -695,8 +745,11 @@ function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name (sign-up, non-solo) */}
-            {isSignUp && activeRole !== "solo-faculty" && (
+
+            {/* ── SIGN-UP ONLY FIELDS ─────────────────────────────────── */}
+
+            {/* Full Name — admin / institution-faculty sign-up only */}
+            {isSignUp && activeRole !== "solo-faculty" && activeRole !== "admin" && (
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</Label>
                 <Input id="name" type="text" placeholder="Fathom User" value={name} autoComplete="off"
@@ -706,11 +759,22 @@ function LoginPage() {
               </div>
             )}
 
-            {/* Solo Faculty Name — always shown for solo role */}
-            {activeRole === "solo-faculty" && (
+            {/* Admin name on sign-up */}
+            {isSignUp && activeRole === "admin" && (
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</Label>
+                <Input id="name" type="text" placeholder="Administrator Name" value={name} autoComplete="off"
+                  onChange={(e) => setName(e.target.value)}
+                  className="h-12 focus:border-black bg-white text-gray-900 border-gray-300"
+                />
+              </div>
+            )}
+
+            {/* Solo Faculty Name — sign-up only */}
+            {isSignUp && activeRole === "solo-faculty" && (
               <div className="space-y-2">
                 <Label htmlFor="facultyName" className="text-sm font-medium text-gray-700">
-                  {isSignUp ? "Your Faculty Name" : "Faculty Name"}
+                  Your Faculty Name
                 </Label>
                 <Input
                   id="facultyName"
@@ -719,18 +783,16 @@ function LoginPage() {
                   value={facultyName}
                   autoComplete="off"
                   onChange={(e) => { setFacultyName(e.target.value); setIsTyping(true); setTimeout(() => setIsTyping(false), 500); }}
-                  required={isSignUp}
+                  required
                   className="h-12 focus:border-black bg-white text-gray-900 border-gray-300"
                 />
-                {isSignUp && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    This name will be used as your faculty profile and cannot be changed later.
-                  </p>
-                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  This name will be used as your faculty profile and cannot be changed later.
+                </p>
               </div>
             )}
 
-            {/* Institution Code — with live validation */}
+            {/* Institution Code — always shown for institution-faculty (needed on both sign-up and login) */}
             {activeRole === "institution-faculty" && (
               <>
                 <InstitutionCodeField
@@ -750,7 +812,7 @@ function LoginPage() {
               </>
             )}
 
-            {/* Institution Name (admin sign-up) */}
+            {/* Institution Name — admin sign-up only */}
             {activeRole === "admin" && isSignUp && (
               <div className="space-y-2">
                 <Label htmlFor="institutionName" className="text-sm font-medium text-gray-700">Institution Name</Label>
@@ -762,7 +824,7 @@ function LoginPage() {
               </div>
             )}
 
-            {/* Admin Code */}
+            {/* Admin Code — always shown for admin */}
             {activeRole === "admin" && (
               <div className="space-y-2">
                 <Label htmlFor="adminCode" className="text-sm font-medium text-gray-700">Admin Code</Label>
@@ -773,6 +835,8 @@ function LoginPage() {
                 />
               </div>
             )}
+
+            {/* ── ALWAYS SHOWN ──────────────────────────────────────── */}
 
             {/* Email */}
             <div className="space-y-2">
@@ -801,7 +865,7 @@ function LoginPage() {
               </div>
             </div>
 
-            {/* Confirm Password (sign-up) */}
+            {/* Confirm Password — sign-up only */}
             {isSignUp && (
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm Password</Label>
@@ -820,7 +884,7 @@ function LoginPage() {
               </div>
             )}
 
-            {/* Remember / Forgot */}
+            {/* Remember / Forgot — login only */}
             {!isSignUp && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
