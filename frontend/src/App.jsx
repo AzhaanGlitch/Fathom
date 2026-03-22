@@ -5,6 +5,7 @@ import LandingPage from './pages/LandingPage.jsx';
 import RoleSelectionPage from './pages/RoleSelectionPage.jsx';
 import FacultyTypePage from './pages/FacultyTypePage.jsx';
 import LoginPage from './components/ui/animated-characters-login-page.jsx';
+import MembersPage from './pages/MembersPage.jsx';
 import DashboardLayout from './layouts/DashboardLayout.jsx';
 import DashboardHome from './pages/Dashboard/DashboardHome.jsx';
 import MentorsPage from './pages/Dashboard/MentorsPage.jsx';
@@ -25,6 +26,7 @@ function App() {
         <Route path="/get-started" element={<RoleSelectionPage />} />
         <Route path="/get-started/faculty" element={<FacultyTypePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/members" element={<MembersPage />} />
 
         {/* Dashboard Routes */}
         <Route path="/dashboard" element={<DashboardLayout />}>
