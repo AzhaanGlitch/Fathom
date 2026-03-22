@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useTheme } from '../contexts/ThemeContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { SparklesCore } from '../components/ui/sparkles';
 import { ContainerScroll } from '../components/ui/container-scroll-animation';
@@ -8,36 +9,10 @@ import { CheckCircle, BarChart3, Users, Award, Sun, Moon, MoveRight } from 'luci
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(true);
-
-  // Apply dark mode class to document root
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+  const { darkMode } = useTheme();
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-black' : 'bg-white'}`} style={{ zoom: '0.95' }}>
-      {/* Fixed Top Bar with Dark Mode Toggle */}
-      <div className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-end items-center">
-        {/* Floating Dark Mode Toggle */}
-        <button
-          onClick={toggleDarkMode}
-          className={`p-3 rounded-full transition-all shadow-lg ${darkMode
-              ? 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-md'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-        >
-          {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-        </button>
-      </div>
 
       {/* Hero Section with Sparkles */}
       <div className={`h-screen relative w-full flex flex-col items-center justify-center overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-black' : 'bg-white'
