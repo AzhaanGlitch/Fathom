@@ -884,21 +884,6 @@ function LoginPage() {
               </div>
             )}
 
-            {/* Remember / Forgot — login only */}
-            {!isSignUp && (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" className="border-gray-300 data-[state=checked]:bg-black data-[state=checked]:text-white" />
-                  <Label htmlFor="remember" className="text-sm font-normal cursor-pointer text-gray-600">
-                    Remember for 30 days
-                  </Label>
-                </div>
-                <button type="button" className="text-sm text-gray-600 hover:text-black hover:underline font-medium">
-                  Forgot password?
-                </button>
-              </div>
-            )}
-
             {/* Error */}
             {error && (
               <div className="p-3 text-sm border rounded-lg text-red-600 bg-red-50 border-red-200">
