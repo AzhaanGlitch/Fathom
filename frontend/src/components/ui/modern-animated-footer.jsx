@@ -36,8 +36,8 @@ export const Footer = ({
                       key={index}
                       href={link.href}
                       className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      target={link.href.startsWith('/') ? "_self" : "_blank"}
+                      rel={link.href.startsWith('/') ? "" : "noopener noreferrer"}
                     >
                       <div className="w-5 h-5 hover:scale-110 duration-300">
                         {link.icon}
