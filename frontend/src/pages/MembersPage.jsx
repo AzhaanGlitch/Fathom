@@ -5,10 +5,12 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { motion } from 'framer-motion';
 import FathomFooter from '../components/ui/fathom-footer';
+import { useTheme } from '../contexts/ThemeContext.jsx';
 
 const MembersPage = () => {
   const navigate = useNavigate();
   const mountRef = useRef(null);
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -121,7 +123,7 @@ const MembersPage = () => {
   };
 
   return (
-    <div className="bg-[#050505] text-white flex flex-col w-full min-h-screen">
+    <div className={`flex flex-col w-full min-h-screen transition-colors duration-300 ${darkMode ? 'bg-[#050505] text-white' : 'bg-gray-50 text-gray-900'}`}>
       
       {/* Top Full Screen Section */}
       <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden">
@@ -136,7 +138,7 @@ const MembersPage = () => {
         <div className="w-full px-8 py-8 absolute top-0 left-0 z-50">
           <button
             onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            className={`inline-flex items-center gap-2 transition-colors ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}`}
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Back to Home</span>
@@ -154,10 +156,10 @@ const MembersPage = () => {
           >
             {/* Header Content */}
             <motion.div variants={itemVariants} className="text-center mb-16">
-              <h1 className="text-5xl md:text-7xl font-extrabold mb-4 tracking-tighter drop-shadow-lg pb-2 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400">
+              <h1 className={`text-5xl md:text-7xl font-extrabold mb-4 tracking-tighter drop-shadow-lg pb-2 bg-clip-text text-transparent ${darkMode ? 'bg-gradient-to-b from-white to-gray-400' : 'bg-gradient-to-b from-gray-900 to-gray-600'}`}>
                 Project Exhibition - 2
               </h1>
-              <h2 className="text-xl md:text-2xl text-gray-400 font-medium tracking-wide">
+              <h2 className={`text-xl md:text-2xl font-medium tracking-wide ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 Group 01 VIT Bhopal University
               </h2>
             </motion.div>
@@ -165,25 +167,27 @@ const MembersPage = () => {
             {/* Cards Content */}
             <motion.div variants={containerVariants} className="flex flex-wrap justify-center gap-6 w-full">
               {members.map((member, index) => (
-                <motion.div 
+                  <motion.div 
                   variants={itemVariants}
                   key={index} 
-                  className="w-[200px] sm:w-[220px] rounded-3xl p-6 flex flex-col items-center text-center
-                             bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(255,255,255,0.02)]
-                             transition-transform duration-300 hover:-translate-y-2 hover:bg-white/10 hover:border-white/20 hover:shadow-[0_16px_48px_0_rgba(255,255,255,0.05)] cursor-default"
+                  className={`w-[200px] sm:w-[220px] rounded-3xl p-6 flex flex-col items-center text-center
+                             backdrop-blur-xl border shadow-[0_8px_32px_0_rgba(255,255,255,0.02)]
+                             transition-transform duration-300 hover:-translate-y-2 cursor-default
+                             ${darkMode ? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:shadow-[0_16px_48px_0_rgba(255,255,255,0.05)]' : 'bg-white/50 border-gray-200 hover:bg-white/70 hover:border-gray-300 hover:shadow-[0_16px_48px_0_rgba(0,0,0,0.05)]'}
+                            `}
                 >
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 border border-gray-600 mb-4 flex items-center justify-center shadow-inner overflow-hidden">
+                  <div className={`w-16 h-16 rounded-full border mb-4 flex items-center justify-center shadow-inner overflow-hidden ${darkMode ? 'bg-gradient-to-br from-gray-700 to-gray-900 border-gray-600' : 'bg-gradient-to-br from-gray-200 to-white border-gray-300'}`}>
                      <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                   </div>
-                  <h3 className="text-lg font-bold mb-1 text-white truncate w-full">{member.name}</h3>
-                  <p className="text-xs text-blue-300 mb-6 font-mono tracking-wider">{member.regNo}</p>
+                  <h3 className={`text-lg font-bold mb-1 truncate w-full ${darkMode ? 'text-white' : 'text-gray-900'}`}>{member.name}</h3>
+                  <p className={`text-xs mb-6 font-mono tracking-wider ${darkMode ? 'text-blue-300' : 'text-blue-600'}`}>{member.regNo}</p>
                   
-                  <div className="flex gap-4 w-full justify-center pt-4 border-t border-white/10 mt-auto">
+                  <div className={`flex gap-4 w-full justify-center pt-4 border-t mt-auto ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
                     <a 
                       href={member.linkedin} 
                       target="_blank" 
                       rel="noreferrer" 
-                      className="p-2.5 rounded-full bg-white/5 hover:bg-[#0A66C2] text-gray-400 hover:text-white transition-all duration-300"
+                      className={`p-2.5 rounded-full transition-all duration-300 ${darkMode ? 'bg-white/5 hover:bg-[#0A66C2] text-gray-400 hover:text-white' : 'bg-black/5 hover:bg-[#0A66C2] text-gray-600 hover:text-white'}`}
                       aria-label={`${member.name} LinkedIn`}
                     >
                       <Linkedin className="w-4 h-4" />
@@ -192,7 +196,7 @@ const MembersPage = () => {
                       href={member.github} 
                       target="_blank" 
                       rel="noreferrer" 
-                      className="p-2.5 rounded-full bg-white/5 hover:bg-white hover:text-black text-gray-400 transition-all duration-300"
+                      className={`p-2.5 rounded-full transition-all duration-300 ${darkMode ? 'bg-white/5 hover:bg-white hover:text-black text-gray-400' : 'bg-black/5 hover:bg-black hover:text-white text-gray-600'}`}
                       aria-label={`${member.name} GitHub`}
                     >
                       <Github className="w-4 h-4" />
@@ -205,11 +209,11 @@ const MembersPage = () => {
         </div>
         
         {/* Gradient Fade connecting to Footer */}
-        <div className="absolute w-full h-48 bottom-0 left-0 bg-gradient-to-t from-[#050505] to-transparent z-10 pointer-events-none" />
+        <div className={`absolute w-full h-48 bottom-0 left-0 bg-gradient-to-t z-10 pointer-events-none ${darkMode ? 'from-[#050505] to-transparent' : 'from-gray-50 to-transparent'}`} />
       </div>
 
       {/* Footer Addition starts immediately after the full screen */}
-      <div className="w-full bg-[#050505] z-20 relative dark">
+      <div className={`w-full z-20 relative transition-colors duration-300 ${darkMode ? 'bg-[#050505]' : 'bg-gray-50'}`}>
         <FathomFooter />
       </div>
 
