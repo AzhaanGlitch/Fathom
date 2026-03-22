@@ -7,6 +7,9 @@ class MentorBase(BaseModel):
     email: str
     expertise: List[str] = []
     bio: Optional[str] = None
+    owner_uid: Optional[str] = None
+    role: Optional[str] = None
+    institution_name: Optional[str] = None
 
 class MentorCreate(MentorBase):
     pass
