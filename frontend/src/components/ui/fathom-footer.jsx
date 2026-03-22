@@ -1,6 +1,6 @@
 import React from 'react';
 import { Footer } from './modern-animated-footer';
-import { Linkedin, Github, Mail } from 'lucide-react';
+import { Linkedin, Users, Mail } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 const FathomFooter = () => {
@@ -9,9 +9,9 @@ const FathomFooter = () => {
 
   const socialLinks = [
     {
-      icon: <Github className="w-6 h-6" />,
-      href: "https://github.com/AzhaanGlitch/Fathom",
-      label: "GitHub",
+      icon: <Users className="w-6 h-6" />,
+      href: "/members",
+      label: "Members",
     },
     {
       icon: <Mail className="w-6 h-6" />,
