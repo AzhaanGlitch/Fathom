@@ -12,7 +12,7 @@ import { accessCodeApi } from '../../api/client';
 // ── helpers ────────────────────────────────────────────────────────────────────
 
 const GlassCard = ({ children, className = '' }) => (
-    <div className={`bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-8 ${className}`}>
+    <div className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-md rounded-2xl p-8 ${className}`}>
         {children}
     </div>
 );
@@ -191,11 +191,11 @@ const AccessCodeGenerator = () => {
 
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-white tracking-tight mb-2 flex items-center gap-3">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2 flex items-center gap-3">
                     <Shield className="w-8 h-8 text-blue-500" />
                     Access Code Manager
                 </h1>
-                <p className="text-gray-400">
+                <p className="text-gray-600 dark:text-gray-400">
                     Generate SHA-256 access codes for institution faculty. Each code is automatically
                     saved to the database the moment it is generated.
                 </p>
@@ -204,11 +204,11 @@ const AccessCodeGenerator = () => {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4">
                 {[
-                    { label: 'Total Codes', value: codes.length, color: 'text-white' },
+                    { label: 'Total Codes', value: codes.length, color: 'text-gray-900 dark:text-white' },
                     { label: 'Active', value: activeCodes, color: 'text-green-400' },
                     { label: 'Assigned to users', value: boundCodes, color: 'text-blue-400' },
                 ].map(({ label, value, color }) => (
-                    <div key={label} className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-col gap-1">
+                    <div key={label} className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-5 flex flex-col gap-1">
                         <span className="text-xs text-gray-500 uppercase tracking-wider">{label}</span>
                         <span className={`text-3xl font-bold ${color}`}>{loadingCodes ? '—' : value}</span>
                     </div>
@@ -218,14 +218,14 @@ const AccessCodeGenerator = () => {
             {/* Generator */}
             <GlassCard className="relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
-                <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                     <Key className="w-5 h-5 text-blue-400" />
                     Generate New Access Code
                 </h2>
 
                 <div className="relative z-10 space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
                             <Users className="w-4 h-4" />
                             Institution / Faculty Name <span className="text-red-400">*</span>
                         </label>
@@ -234,12 +234,12 @@ const AccessCodeGenerator = () => {
                             value={institutionName}
                             onChange={e => setInstitutionName(e.target.value)}
                             placeholder="e.g. VIT University — Dr. Sharma"
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                            className="w-full bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                             Description <span className="text-gray-600">(optional)</span>
                         </label>
                         <input
@@ -247,12 +247,12 @@ const AccessCodeGenerator = () => {
                             value={description}
                             onChange={e => setDescription(e.target.value)}
                             placeholder="e.g. Dept. of Computer Science, Semester 1"
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                            className="w-full bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
                             <Type className="w-4 h-4" />
                             Secret Seed Text <span className="text-red-400">*</span>
                         </label>
@@ -261,7 +261,7 @@ const AccessCodeGenerator = () => {
                             value={inputText}
                             onChange={e => { setInputText(e.target.value); setSaveStatus(null); setSaveError(''); setGeneratedHash(''); }}
                             placeholder="e.g. faculty ID, email, or passphrase"
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                            className="w-full bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                         />
                         <p className="text-xs text-gray-600 mt-1.5 italic">
                             Hashed locally — this text is never sent to the server.
@@ -273,7 +273,7 @@ const AccessCodeGenerator = () => {
                             onClick={handleGenerate}
                             disabled={!canGenerate}
                             className={`flex items-center gap-2 px-7 py-3 rounded-xl font-bold transition-all shadow-lg ${!canGenerate
-                                    ? 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5'
+                                    ? 'bg-gray-100 dark:bg-white/5 text-gray-500 cursor-not-allowed border border-white/5'
                                     : 'bg-white text-black hover:bg-gray-200 active:scale-95'
                                 }`}
                         >
@@ -291,7 +291,7 @@ const AccessCodeGenerator = () => {
                             <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                             <div>
                                 <p className="text-sm font-semibold text-red-400">Could not save to database</p>
-                                <p className="text-xs text-gray-400 mt-0.5">{saveError}</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{saveError}</p>
                             </div>
                         </div>
                     )}
@@ -310,7 +310,7 @@ const AccessCodeGenerator = () => {
                                 <Shield className="w-4 h-4" />
                                 Generated SHA-256 Hash — share this with the faculty member
                             </label>
-                            <div className="bg-black/60 border border-white/10 rounded-xl p-5 font-mono text-sm break-all text-white/90 leading-relaxed">
+                            <div className="bg-black/60 border border-gray-200 dark:border-white/10 rounded-xl p-5 font-mono text-sm break-all text-gray-900 dark:text-white/90 leading-relaxed">
                                 {generatedHash}
                             </div>
                         </div>
@@ -318,7 +318,7 @@ const AccessCodeGenerator = () => {
                             onClick={() => handleCopy(generatedHash)}
                             className={`w-full md:w-auto flex-shrink-0 flex items-center justify-center gap-3 px-7 py-4 rounded-xl transition-all font-semibold ${copied
                                     ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                    : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
+                                    : 'bg-gray-200 dark:bg-white/10 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-white/20 border border-gray-200 dark:border-white/10'
                                 }`}
                         >
                             {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
@@ -335,22 +335,22 @@ const AccessCodeGenerator = () => {
             )}
 
             {/* Table */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+            <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden">
                 <button
                     onClick={() => setShowTable(v => !v)}
-                    className="w-full flex items-center justify-between px-7 py-5 hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center justify-between px-7 py-5 hover:bg-gray-100 dark:bg-white/5 transition-colors"
                 >
                     <div className="flex items-center gap-3">
-                        <Shield className="w-5 h-5 text-gray-400" />
-                        <span className="font-bold text-white text-lg">Saved Access Codes</span>
-                        <span className="px-2 py-0.5 rounded-full bg-white/10 text-gray-300 text-xs font-medium">{codes.length}</span>
+                        <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                        <span className="font-bold text-gray-900 dark:text-white text-lg">Saved Access Codes</span>
+                        <span className="px-2 py-0.5 rounded-full bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 text-xs font-medium">{codes.length}</span>
                     </div>
-                    {showTable ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                    {showTable ? <ChevronUp className="w-5 h-5 text-gray-600 dark:text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-600 dark:text-gray-400" />}
                 </button>
 
                 {showTable && (
                     loadingCodes ? (
-                        <div className="flex items-center justify-center py-16 gap-3 text-gray-400">
+                        <div className="flex items-center justify-center py-16 gap-3 text-gray-600 dark:text-gray-400">
                             <Loader className="w-6 h-6 animate-spin" /><span>Loading…</span>
                         </div>
                     ) : codes.length === 0 ? (
@@ -362,7 +362,7 @@ const AccessCodeGenerator = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-t border-white/10">
+                                    <tr className="border-t border-gray-200 dark:border-white/10">
                                         {['Institution / Name', 'Description', 'Status', 'Assigned', 'Created', ''].map(h => (
                                             <th key={h} className="text-left px-6 py-3 text-gray-500 font-semibold uppercase tracking-wider text-xs last:text-right">{h}</th>
                                         ))}
@@ -370,9 +370,9 @@ const AccessCodeGenerator = () => {
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
                                     {codes.map(code => (
-                                        <tr key={code.id} className="hover:bg-white/5 transition-colors group">
-                                            <td className="px-6 py-4 font-medium text-white">{code.institution_name}</td>
-                                            <td className="px-6 py-4 text-gray-400 max-w-[180px] truncate">
+                                        <tr key={code.id} className="hover:bg-gray-100 dark:bg-white/5 transition-colors group">
+                                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{code.institution_name}</td>
+                                            <td className="px-6 py-4 text-gray-600 dark:text-gray-400 max-w-[180px] truncate">
                                                 {code.description || <span className="text-gray-700 italic">—</span>}
                                             </td>
                                             <td className="px-6 py-4"><Badge active={code.is_active} /></td>
@@ -409,21 +409,21 @@ const AccessCodeGenerator = () => {
 
             {/* Info cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="p-5 bg-white/5 border border-white/5 rounded-2xl">
-                    <h3 className="text-white font-bold mb-2 flex items-center gap-2 text-sm">
+                <div className="p-5 bg-gray-100 dark:bg-white/5 border border-white/5 rounded-2xl">
+                    <h3 className="text-gray-900 dark:text-white font-bold mb-2 flex items-center gap-2 text-sm">
                         <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />How access codes work
                     </h3>
-                    <p className="text-xs text-gray-400 leading-relaxed">
-                        Enter a seed phrase and institution name, then click <strong className="text-white">Generate & Save</strong>.
+                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                        Enter a seed phrase and institution name, then click <strong className="text-gray-900 dark:text-white">Generate & Save</strong>.
                         The seed is hashed client-side and the SHA-256 hash is immediately saved to the database.
                         Share the hash with the faculty member — they enter it on the login page and it binds permanently to their account.
                     </p>
                 </div>
-                <div className="p-5 bg-white/5 border border-white/5 rounded-2xl">
-                    <h3 className="text-white font-bold mb-2 flex items-center gap-2 text-sm">
+                <div className="p-5 bg-gray-100 dark:bg-white/5 border border-white/5 rounded-2xl">
+                    <h3 className="text-gray-900 dark:text-white font-bold mb-2 flex items-center gap-2 text-sm">
                         <span className="w-2 h-2 rounded-full bg-purple-500 inline-block" />Security model
                     </h3>
-                    <p className="text-xs text-gray-400 leading-relaxed">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                         The seed text never leaves the browser — only the hash is stored. Once a faculty member
                         logs in with a code it binds to their Firebase UID so no other account can use it.
                         Revoke blocks future logins; Delete removes the record entirely.
