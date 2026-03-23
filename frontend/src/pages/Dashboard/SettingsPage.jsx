@@ -25,7 +25,7 @@ const SettingsPage = () => {
   };
 
   const GlassCard = ({ children, className = "" }) => (
-    <div className={`bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all ${className}`}>
+    <div className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-gray-200 dark:bg-white/10 hover:border-gray-300 dark:border-white/20 transition-all ${className}`}>
       {children}
     </div>
   );
@@ -37,8 +37,8 @@ const SettingsPage = () => {
           <Icon className="w-6 h-6 text-blue-400" />
         </div>
         <div className="flex-1">
-          <h3 className="text-lg font-bold text-white mb-1">{title}</h3>
-          <p className="text-sm text-gray-400">{description}</p>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{title}</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
         </div>
       </div>
       <div className="space-y-4">
@@ -48,11 +48,11 @@ const SettingsPage = () => {
   );
 
   const SettingItem = ({ label, description, children }) => (
-    <div className="flex items-center justify-between py-3 border-t border-white/10 first:border-t-0 first:pt-0">
+    <div className="flex items-center justify-between py-3 border-t border-gray-200 dark:border-white/10 first:border-t-0 first:pt-0">
       <div className="flex-1">
-        <p className="text-white font-medium">{label}</p>
+        <p className="text-gray-900 dark:text-white font-medium">{label}</p>
         {description && (
-          <p className="text-sm text-gray-400 mt-1">{description}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{description}</p>
         )}
       </div>
       <div className="ml-4">
@@ -65,7 +65,7 @@ const SettingsPage = () => {
     <button
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        checked ? 'bg-blue-600' : 'bg-white/10'
+        checked ? 'bg-blue-600' : 'bg-gray-200 dark:bg-white/10'
       }`}
     >
       <span
@@ -81,15 +81,15 @@ const SettingsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Settings</h1>
-          <p className="text-gray-400">Manage your application preferences and account settings</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">Settings</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your application preferences and account settings</p>
         </div>
         <button
           onClick={handleSave}
           className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-lg ${
             saved
-              ? 'bg-green-600 text-white'
-              : 'bg-blue-600 hover:bg-blue-500 text-white'
+              ? 'bg-green-600 text-gray-900 dark:text-white'
+              : 'bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white'
           }`}
         >
           <Save className="w-5 h-5" />
@@ -176,7 +176,7 @@ const SettingsPage = () => {
           label="Two-Factor Authentication"
           description="Add an extra layer of security"
         >
-          <button className="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/10 transition-all text-sm backdrop-blur-sm">
+          <button className="px-4 py-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-lg hover:bg-gray-200 dark:bg-white/10 transition-all text-sm backdrop-blur-sm">
             Enable 2FA
           </button>
         </SettingItem>
@@ -195,7 +195,7 @@ const SettingsPage = () => {
           <select
             value={settings.language}
             onChange={(e) => setSettings({ ...settings, language: e.target.value })}
-            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
+            className="px-4 py-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
           >
             <option value="en">English</option>
             <option value="es">Español</option>
@@ -210,7 +210,7 @@ const SettingsPage = () => {
           description="Set your local time zone"
         >
           <select
-            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
+            className="px-4 py-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
           >
             <option>UTC (GMT+0:00)</option>
             <option>EST (GMT-5:00)</option>
@@ -228,18 +228,18 @@ const SettingsPage = () => {
             <Shield className="w-6 h-6 text-red-400" />
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-white mb-1">Danger Zone</h3>
-            <p className="text-sm text-gray-400">Irreversible actions for your account</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Danger Zone</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Irreversible actions for your account</p>
           </div>
         </div>
         <div className="space-y-3">
           <button className="w-full px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl hover:bg-red-500/20 transition-all text-left backdrop-blur-sm">
             <p className="font-medium">Delete All Sessions</p>
-            <p className="text-sm text-gray-400 mt-1">Permanently delete all your teaching sessions</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Permanently delete all your teaching sessions</p>
           </button>
           <button className="w-full px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl hover:bg-red-500/20 transition-all text-left backdrop-blur-sm">
             <p className="font-medium">Delete Account</p>
-            <p className="text-sm text-gray-400 mt-1">Permanently delete your account and all data</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Permanently delete your account and all data</p>
           </button>
         </div>
       </div>
