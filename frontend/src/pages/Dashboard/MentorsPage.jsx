@@ -105,7 +105,7 @@ const MentorsPage = () => {
   const getTrendIcon = (trend) => {
     if (trend === 'improving') return <TrendingUp className="w-5 h-5 text-green-400" />;
     if (trend === 'declining') return <TrendingDown className="w-5 h-5 text-red-400" />;
-    return <Minus className="w-5 h-5 text-gray-400" />;
+    return <Minus className="w-5 h-5 text-gray-600 dark:text-gray-400" />;
   };
 
   const getScoreColor = (score) => {
@@ -120,13 +120,13 @@ const MentorsPage = () => {
   );
 
   const GlassCard = ({ children, className = "" }) => (
-    <div className={`bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
+    <div className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
       {children}
     </div>
   );
 
   const MentorCard = ({ mentor, stats }) => (
-    <div className="group bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/10 transition-all relative overflow-hidden">
+    <div className="group bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-gray-200 dark:bg-white/10 transition-all relative overflow-hidden">
       {/* Background Glow Effect */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
 
@@ -138,13 +138,13 @@ const MentorsPage = () => {
             onClick={() => navigate(`/dashboard/sessions?mentor=${mentor.id}`)}
           >
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-              <User className="w-7 h-7 text-white" />
+              <User className="w-7 h-7 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-400 transition-colors">
                 {mentor.name}
               </h3>
-              <p className="text-sm text-gray-400">{mentor.email}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{mentor.email}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -163,7 +163,7 @@ const MentorsPage = () => {
         {/* Bio */}
         {mentor.bio && (
           <p 
-            className="text-sm text-gray-400 mb-4 line-clamp-2 cursor-pointer"
+            className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2 cursor-pointer"
             onClick={() => navigate(`/dashboard/sessions?mentor=${mentor.id}`)}
           >
             {mentor.bio}
@@ -185,7 +185,7 @@ const MentorsPage = () => {
               </span>
             ))}
             {mentor.expertise.length > 3 && (
-              <span className="px-3 py-1 text-xs font-medium bg-white/5 text-gray-400 rounded-full border border-white/10">
+              <span className="px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 rounded-full border border-gray-200 dark:border-white/10">
                 +{mentor.expertise.length - 3} more
               </span>
             )}
@@ -194,12 +194,12 @@ const MentorsPage = () => {
 
         {/* Stats Footer */}
         <div 
-          className="flex items-center justify-between pt-4 border-t border-white/10 cursor-pointer"
+          className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-white/10 cursor-pointer"
           onClick={() => navigate(`/dashboard/sessions?mentor=${mentor.id}`)}
         >
           <div>
             <p className="text-xs text-gray-500 mb-1">Total Sessions</p>
-            <p className="text-xl font-bold text-white">
+            <p className="text-xl font-bold text-gray-900 dark:text-white">
               {stats?.total_sessions || mentor.total_sessions || 0}
             </p>
           </div>
@@ -207,7 +207,7 @@ const MentorsPage = () => {
             <p className="text-xs text-gray-500 mb-1">Average Score</p>
             {stats?.average_score || mentor.average_score ? (
               <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r ${getScoreColor(stats?.average_score || mentor.average_score)}`}>
-                <span className="text-xl font-bold text-white">
+                <span className="text-xl font-bold text-gray-900 dark:text-white">
                   {(stats?.average_score || mentor.average_score).toFixed(1)}
                 </span>
               </div>
@@ -233,12 +233,12 @@ const MentorsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Mentors</h1>
-          <p className="text-gray-400 mt-1">Manage and track mentor performance</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Mentors</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage and track mentor performance</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors text-sm"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-lg font-medium transition-colors text-sm"
         >
           <Plus className="w-5 h-5" />
           Add Mentor
@@ -248,18 +248,18 @@ const MentorsPage = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <GlassCard>
-          <p className="text-sm text-gray-400 mb-2">Total Mentors</p>
-          <p className="text-4xl font-bold text-white">{mentors.length}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Mentors</p>
+          <p className="text-4xl font-bold text-gray-900 dark:text-white">{mentors.length}</p>
         </GlassCard>
         <GlassCard>
-          <p className="text-sm text-gray-400 mb-2">Total Sessions</p>
-          <p className="text-4xl font-bold text-white">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Sessions</p>
+          <p className="text-4xl font-bold text-gray-900 dark:text-white">
             {mentors.reduce((sum, m) => sum + (m.total_sessions || 0), 0)}
           </p>
         </GlassCard>
         <GlassCard>
-          <p className="text-sm text-gray-400 mb-2">Average Score</p>
-          <p className="text-4xl font-bold text-white">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Average Score</p>
+          <p className="text-4xl font-bold text-gray-900 dark:text-white">
             {mentors.filter((m) => m.average_score).length > 0
               ? (
                 mentors
@@ -275,17 +275,17 @@ const MentorsPage = () => {
       {/* Search and Filter */}
       <div className="flex items-center gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600 dark:text-gray-400 pointer-events-none" />
           <input
             type="text"
             placeholder="Search mentors..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
+            className="w-full pl-12 pr-4 py-3 bg-gray-200 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
           />
         </div>
-        <button className="p-3 bg-white/10 border border-white/20 rounded-xl hover:bg-white/15 transition-colors backdrop-blur-sm">
-          <Filter className="w-5 h-5 text-gray-400" />
+        <button className="p-3 bg-gray-200 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-xl hover:bg-white/15 transition-colors backdrop-blur-sm">
+          <Filter className="w-5 h-5 text-gray-600 dark:text-gray-400" />
         </button>
       </div>
 
@@ -293,14 +293,14 @@ const MentorsPage = () => {
       {filteredMentors.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <User className="w-16 h-16 mx-auto text-gray-600 mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">No mentors found</h3>
-          <p className="text-gray-400 mb-6">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No mentors found</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             {searchQuery ? 'Try a different search term' : 'Get started by adding your first mentor'}
           </p>
           {!searchQuery && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-lg font-medium transition-colors"
             >
               <Plus className="w-5 h-5" />
               Add Mentor
@@ -322,11 +322,11 @@ const MentorsPage = () => {
       {/* Add Mentor Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl">
-            <h2 className="text-2xl font-bold text-white mb-6">Add New Mentor</h2>
+          <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add New Mentor</h2>
             <form onSubmit={handleAddMentor} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Name *
                 </label>
                 <input
@@ -334,12 +334,12 @@ const MentorsPage = () => {
                   required
                   value={newMentor.name}
                   onChange={(e) => setNewMentor({ ...newMentor, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
                   placeholder="Enter mentor name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Email *
                 </label>
                 <input
@@ -347,12 +347,12 @@ const MentorsPage = () => {
                   required
                   value={newMentor.email}
                   onChange={(e) => setNewMentor({ ...newMentor, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
                   placeholder="mentor@example.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Expertise (comma-separated)
                 </label>
                 <input
@@ -360,11 +360,11 @@ const MentorsPage = () => {
                   value={newMentor.expertise}
                   onChange={(e) => setNewMentor({ ...newMentor, expertise: e.target.value })}
                   placeholder="Python, Machine Learning, Data Science"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Bio
                 </label>
                 <textarea
@@ -372,20 +372,20 @@ const MentorsPage = () => {
                   onChange={(e) => setNewMentor({ ...newMentor, bio: e.target.value })}
                   rows="3"
                   placeholder="Tell us about this mentor..."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all resize-none backdrop-blur-sm"
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all resize-none backdrop-blur-sm"
                 />
               </div>
               <div className="flex gap-3 mt-6">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all font-medium backdrop-blur-sm"
+                  className="flex-1 px-6 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:bg-white/10 transition-all font-medium backdrop-blur-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all font-medium shadow-lg"
+                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-xl transition-all font-medium shadow-lg"
                 >
                   Add Mentor
                 </button>
@@ -398,14 +398,14 @@ const MentorsPage = () => {
       {/* NEW: Delete Confirmation Modal */}
       {showDeleteModal && mentorToDelete && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl">
+          <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-3 bg-red-500/20 rounded-xl">
                 <Trash2 className="w-6 h-6 text-red-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Delete Mentor</h2>
-                <p className="text-gray-300">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Delete Mentor</h2>
+                <p className="text-gray-700 dark:text-gray-300">
                   Are you sure you want to delete <strong>{mentorToDelete.name}</strong>? This action cannot be undone.
                 </p>
               </div>
@@ -415,7 +415,7 @@ const MentorsPage = () => {
               <p className="text-sm text-yellow-300">
                 <strong>Warning:</strong> Deleting this mentor will:
               </p>
-              <ul className="text-sm text-gray-300 mt-2 ml-4 list-disc">
+              <ul className="text-sm text-gray-700 dark:text-gray-300 mt-2 ml-4 list-disc">
                 <li>Remove all mentor information</li>
                 <li>Keep their sessions (but unlink the mentor)</li>
                 <li>Remove them from analytics</li>
@@ -429,14 +429,14 @@ const MentorsPage = () => {
                   setMentorToDelete(null);
                 }}
                 disabled={deletingMentor}
-                className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all font-medium disabled:opacity-50"
+                className="flex-1 px-6 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:bg-white/10 transition-all font-medium disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteMentor}
                 disabled={deletingMentor}
-                className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-gray-900 dark:text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {deletingMentor ? (
                   <>
