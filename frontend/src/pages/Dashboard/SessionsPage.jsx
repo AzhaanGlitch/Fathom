@@ -202,7 +202,7 @@ const SessionsPage = () => {
   // ── Helpers ────────────────────────────────────────────────────────────────
   const getStatusConfig = (status) => {
     const configs = {
-      uploaded: { icon: Video, text: 'Uploaded', bgColor: 'bg-gray-500/10', textColor: 'text-gray-400', borderColor: 'border-gray-500/20' },
+      uploaded: { icon: Video, text: 'Uploaded', bgColor: 'bg-gray-500/10', textColor: 'text-gray-600 dark:text-gray-400', borderColor: 'border-gray-500/20' },
       transcribing: { icon: Loader, text: 'Transcribing', bgColor: 'bg-blue-500/10', textColor: 'text-blue-400', borderColor: 'border-blue-500/20', animate: true },
       analyzing: { icon: Loader, text: 'Analyzing', bgColor: 'bg-purple-500/10', textColor: 'text-purple-400', borderColor: 'border-purple-500/20', animate: true },
       completed: { icon: CheckCircle, text: 'Completed', bgColor: 'bg-green-500/10', textColor: 'text-green-400', borderColor: 'border-green-500/20' },
@@ -235,7 +235,7 @@ const SessionsPage = () => {
   });
 
   const GlassCard = ({ children, className = '' }) => (
-    <div className={`bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
+    <div className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
       {children}
     </div>
   );
@@ -246,13 +246,13 @@ const SessionsPage = () => {
     const sessionIdStr = session.id || session._id;
 
     return (
-      <div className="group bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all relative overflow-hidden">
+      <div className="group bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-gray-200 dark:bg-white/10 hover:border-gray-300 dark:border-white/20 transition-all relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl group-hover:opacity-100 opacity-0 transition-opacity" />
         <div className="relative z-10">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1 cursor-pointer" onClick={() => navigate(`/dashboard/sessions/${sessionIdStr}`)}>
-              <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors mb-1">{session.title}</h3>
-              <p className="text-sm text-gray-400">{session.topic}</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-400 transition-colors mb-1">{session.title}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{session.topic}</p>
             </div>
             <div className="flex items-center gap-2">
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${statusConfig.bgColor} border ${statusConfig.borderColor}`}>
@@ -269,7 +269,7 @@ const SessionsPage = () => {
           </div>
 
           <div
-            className="flex items-center gap-4 text-sm text-gray-400 mb-4 cursor-pointer"
+            className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4 cursor-pointer"
             onClick={() => navigate(`/dashboard/sessions/${sessionIdStr}`)}
           >
             <div className="flex items-center gap-1"><Clock className="w-4 h-4" /><span>{formatDuration(session.duration)}</span></div>
@@ -279,11 +279,11 @@ const SessionsPage = () => {
           {/* Show mentor name only for admins viewing all sessions */}
           {isAdmin && allMentors[session.mentor_id] && (
             <div
-              className="pt-3 border-t border-white/10 flex items-center gap-2 cursor-pointer"
+              className="pt-3 border-t border-gray-200 dark:border-white/10 flex items-center gap-2 cursor-pointer"
               onClick={() => navigate(`/dashboard/sessions/${sessionIdStr}`)}
             >
               <User className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-300">{allMentors[session.mentor_id]}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{allMentors[session.mentor_id]}</span>
             </div>
           )}
         </div>
@@ -307,15 +307,15 @@ const SessionsPage = () => {
         <div>
           <div className="flex items-center gap-3 mb-2">
             {isAdmin && urlMentorId && (
-              <button onClick={() => navigate('/dashboard/mentors')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                <ArrowLeft className="w-5 h-5 text-gray-400 hover:text-white" />
+              <button onClick={() => navigate('/dashboard/mentors')} className="p-2 hover:bg-gray-100 dark:bg-white/5 rounded-lg transition-colors">
+                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white" />
               </button>
             )}
-            <h1 className="text-3xl font-bold text-white tracking-tight">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
               {mentor ? `${mentor.name}'s Sessions` : isAdmin ? 'All Sessions' : 'My Sessions'}
             </h1>
           </div>
-          <p className="text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400">
             {isAdmin
               ? 'Upload and manage teaching session videos'
               : `Showing sessions for ${mentor?.name || 'your profile'}`}
@@ -323,7 +323,7 @@ const SessionsPage = () => {
         </div>
         <button
           onClick={() => setShowUploadModal(true)}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors text-sm"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-lg font-medium transition-colors text-sm"
         >
           <Upload className="w-5 h-5" />
           Upload Session
@@ -332,28 +332,28 @@ const SessionsPage = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <GlassCard><p className="text-sm text-gray-400 mb-2">Total Sessions</p><p className="text-4xl font-bold text-white">{sessions.length}</p></GlassCard>
-        <GlassCard><p className="text-sm text-gray-400 mb-2">Completed</p><p className="text-4xl font-bold text-green-400">{sessions.filter(s => s.status === 'completed').length}</p></GlassCard>
-        <GlassCard><p className="text-sm text-gray-400 mb-2">Processing</p><p className="text-4xl font-bold text-blue-400">{sessions.filter(s => ['transcribing', 'analyzing'].includes(s.status)).length}</p></GlassCard>
-        <GlassCard><p className="text-sm text-gray-400 mb-2">Failed</p><p className="text-4xl font-bold text-red-400">{sessions.filter(s => s.status === 'failed').length}</p></GlassCard>
+        <GlassCard><p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Sessions</p><p className="text-4xl font-bold text-gray-900 dark:text-white">{sessions.length}</p></GlassCard>
+        <GlassCard><p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Completed</p><p className="text-4xl font-bold text-green-400">{sessions.filter(s => s.status === 'completed').length}</p></GlassCard>
+        <GlassCard><p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Processing</p><p className="text-4xl font-bold text-blue-400">{sessions.filter(s => ['transcribing', 'analyzing'].includes(s.status)).length}</p></GlassCard>
+        <GlassCard><p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Failed</p><p className="text-4xl font-bold text-red-400">{sessions.filter(s => s.status === 'failed').length}</p></GlassCard>
       </div>
 
       {/* Search and Filter */}
       <div className="flex items-center gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600 dark:text-gray-400 pointer-events-none" />
           <input
             type="text"
             placeholder="Search sessions..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
+            className="w-full pl-12 pr-4 py-3 bg-gray-200 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
           />
         </div>
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
+          className="px-4 py-3 bg-gray-200 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all backdrop-blur-sm"
         >
           <option value="all">All Status</option>
           <option value="completed">Completed</option>
@@ -368,16 +368,16 @@ const SessionsPage = () => {
       {filteredSessions.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <Video className="w-16 h-16 mx-auto text-gray-600 mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             {searchQuery || filterStatus !== 'all' ? 'No sessions found' : 'No sessions yet'}
           </h3>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             {searchQuery || filterStatus !== 'all' ? 'Try adjusting your filters' : 'Upload your first teaching session to get started'}
           </p>
           {!searchQuery && filterStatus === 'all' && (
             <button
               onClick={() => setShowUploadModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-lg font-medium transition-colors"
             >
               <Upload className="w-5 h-5" />Upload Session
             </button>
@@ -405,21 +405,21 @@ const SessionsPage = () => {
           />
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
             <div
-              className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl pointer-events-auto"
+              className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-2xl font-bold text-white mb-6">Upload Teaching Session</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Upload Teaching Session</h2>
               <form onSubmit={handleUploadSession} className="space-y-4">
 
                 {/* Mentor: selector for admins, locked badge for faculty */}
                 {isAdmin ? (
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Select Mentor *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Mentor *</label>
                     <select
                       required
                       value={uploadForm.selectedMentorId}
                       onChange={(e) => setUploadForm({ ...uploadForm, selectedMentorId: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-900 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                       style={{ colorScheme: 'dark' }}
                     >
                       <option value="">Choose a mentor...</option>
@@ -430,10 +430,10 @@ const SessionsPage = () => {
                   </div>
                 ) : (
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Mentor</label>
-                    <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mentor</label>
+                    <div className="flex items-center gap-3 px-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl">
                       <User className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                      <span className="text-white font-medium flex-1">{mentor?.name || 'Your profile'}</span>
+                      <span className="text-gray-900 dark:text-white font-medium flex-1">{mentor?.name || 'Your profile'}</span>
                       <div className="flex items-center gap-1.5 px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
                         <Lock className="w-3 h-3 text-blue-400" />
                         <span className="text-xs text-blue-400 font-medium">Auto-assigned</span>
@@ -445,37 +445,37 @@ const SessionsPage = () => {
 
                 {/* Title */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Session Title *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Session Title *</label>
                   <input
                     type="text" required value={uploadForm.title}
                     onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
                     placeholder="e.g., Python Decorators Explained"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                    className="w-full px-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                   />
                 </div>
 
                 {/* Topic */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Topic *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Topic *</label>
                   <input
                     type="text" required value={uploadForm.topic}
                     onChange={(e) => setUploadForm({ ...uploadForm, topic: e.target.value })}
                     placeholder="e.g., Python Programming"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                    className="w-full px-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                   />
                 </div>
 
                 {/* File */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Video File *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Video File *</label>
                   <input
                     type="file" required
                     accept="video/mp4,video/mpeg,video/quicktime,video/x-msvideo,video/x-matroska"
                     onChange={(e) => setUploadForm({ ...uploadForm, video: e.target.files[0] })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30 cursor-pointer transition-all"
+                    className="w-full px-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30 cursor-pointer transition-all"
                   />
                   {uploadForm.video && (
-                    <p className="text-sm text-gray-400 mt-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                       Selected: {uploadForm.video.name}
                       <span className="text-gray-500 ml-2">({(uploadForm.video.size / (1024 * 1024)).toFixed(2)} MB)</span>
                     </p>
@@ -486,11 +486,11 @@ const SessionsPage = () => {
                 {/* Progress */}
                 {uploading && (
                   <div className="w-full space-y-2">
-                    <div className="flex justify-between text-xs text-gray-400">
+                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                       <span>{uploadPhase === 'processing' ? 'Processing on server...' : `Uploading... ${uploadProgress}%`}</span>
                       <span>{uploadForm.video ? (uploadForm.video.size / (1024 * 1024)).toFixed(1) + ' MB' : ''}</span>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                    <div className="w-full bg-gray-200 dark:bg-white/10 rounded-full h-2.5 overflow-hidden">
                       <div
                         className="h-2.5 rounded-full transition-all duration-300 ease-out"
                         style={{
@@ -523,14 +523,14 @@ const SessionsPage = () => {
                       setUploadError('');
                     }}
                     disabled={uploading}
-                    className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-6 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:bg-white/10 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {uploading ? 'Please wait...' : 'Cancel'}
                   </button>
                   <button
                     type="submit"
                     disabled={uploading || !uploadForm.video}
-                    className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50"
+                    className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50"
                   >
                     {uploading ? (
                       <span className="flex items-center justify-center gap-2">
@@ -555,28 +555,28 @@ const SessionsPage = () => {
           />
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
             <div
-              className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl pointer-events-auto"
+              className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start gap-4 mb-6">
                 <div className="p-3 bg-red-500/20 rounded-xl"><Trash2 className="w-6 h-6 text-red-400" /></div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Delete Session</h2>
-                  <p className="text-gray-300">Are you sure you want to delete this session? This action cannot be undone.</p>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Delete Session</h2>
+                  <p className="text-gray-700 dark:text-gray-300">Are you sure you want to delete this session? This action cannot be undone.</p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <button
                   onClick={() => { setShowDeleteModal(false); setSessionToDelete(null); }}
                   disabled={!!deletingSession}
-                  className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all font-medium disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:bg-white/10 transition-all font-medium disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteSession}
                   disabled={!!deletingSession}
-                  className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-gray-900 dark:text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {deletingSession
                     ? <><Loader className="w-4 h-4 animate-spin" />Deleting...</>
