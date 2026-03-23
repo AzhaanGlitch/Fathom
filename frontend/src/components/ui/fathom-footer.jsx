@@ -1,6 +1,6 @@
 import React from 'react';
 import { Footer } from './modern-animated-footer';
-import { Linkedin, Users, Mail } from 'lucide-react';
+import { Linkedin, Users, Mail, Github } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 const FathomFooter = () => {
@@ -12,6 +12,11 @@ const FathomFooter = () => {
       icon: <Users className="w-6 h-6" />,
       href: "/members",
       label: "Members",
+    },
+    {
+      icon: <Github className="w-6 h-6" />,
+      href: "https://github.com/AzhaanGlitch/Fathom",
+      label: "GitHub",
     },
     {
       icon: <Mail className="w-6 h-6" />,
@@ -29,7 +34,7 @@ const FathomFooter = () => {
       socialLinks={socialLinks}
       navLinks={navLinks}
       creatorName="Group 01"
-      creatorUrl="https://www.linkedin.com/in/parth-gupta-4598b8324/"
+      creatorUrl="/FATHOM FINAL PPT.pptx"
       brandIcon={
         <img 
           src="/logo.png" 
