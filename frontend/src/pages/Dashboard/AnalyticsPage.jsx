@@ -135,7 +135,7 @@ const AnalyticsPage = () => {
   };
 
   const GlassCard = ({ children, className = '' }) => (
-    <div className={`bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
+    <div className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
       {children}
     </div>
   );
@@ -148,17 +148,17 @@ const AnalyticsPage = () => {
       orange: 'from-orange-500 to-orange-600',
     };
     return (
-      <GlassCard className="relative overflow-hidden group hover:bg-white/10 hover:border-white/20 transition-all">
+      <GlassCard className="relative overflow-hidden group hover:bg-gray-200 dark:bg-white/10 hover:border-gray-300 dark:border-white/20 transition-all">
         <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${colorClasses[color]} opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity`} />
         <div className="relative z-10">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p className="text-gray-400 text-sm font-medium mb-1">{title}</p>
-              <h3 className="text-3xl font-bold text-white">{value}</h3>
-              {subtitle && <p className="text-sm text-gray-400 mt-1">{subtitle}</p>}
+              <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-1">{title}</p>
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{value}</h3>
+              {subtitle && <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{subtitle}</p>}
             </div>
             <div className={`p-3 rounded-xl bg-gradient-to-br ${colorClasses[color]} shadow-lg`}>
-              <Icon className="w-6 h-6 text-white" />
+              <Icon className="w-6 h-6 text-gray-900 dark:text-white" />
             </div>
           </div>
           {trend && (
@@ -195,10 +195,10 @@ const AnalyticsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">
             {isAdmin ? 'Platform Analytics' : 'My Analytics'}
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400">
             {isAdmin
               ? 'Comprehensive performance insights across all mentors'
               : `Performance insights for ${myMentor?.name || 'your profile'}`}
@@ -207,7 +207,7 @@ const AnalyticsPage = () => {
         <select
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value)}
-          className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all backdrop-blur-sm"
+          className="px-4 py-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all backdrop-blur-sm"
         >
           <option value="7d">Last 7 days</option>
           <option value="30d">Last 30 days</option>
@@ -220,11 +220,11 @@ const AnalyticsPage = () => {
       {!isAdmin && myMentor && (
         <GlassCard className="flex items-center gap-4 py-4 border-blue-500/20 bg-blue-500/5">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-            <User className="w-5 h-5 text-white" />
+            <User className="w-5 h-5 text-gray-900 dark:text-white" />
           </div>
           <div>
             <p className="text-xs text-blue-400 font-medium uppercase tracking-wider mb-0.5">Viewing analytics for</p>
-            <p className="text-white font-semibold">{myMentor.name}</p>
+            <p className="text-gray-900 dark:text-white font-semibold">{myMentor.name}</p>
           </div>
         </GlassCard>
       )}
@@ -241,11 +241,11 @@ const AnalyticsPage = () => {
 
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <GlassCard className="hover:bg-white/10 hover:border-white/20 transition-all">
+        <GlassCard className="hover:bg-gray-200 dark:bg-white/10 hover:border-gray-300 dark:border-white/20 transition-all">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-lg font-bold text-white mb-1">Performance Trend</h3>
-              <p className="text-sm text-gray-400">Sessions over time</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Performance Trend</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Sessions over time</p>
             </div>
             <Activity className="w-6 h-6 text-blue-400" />
           </div>
@@ -266,11 +266,11 @@ const AnalyticsPage = () => {
           </ResponsiveContainer>
         </GlassCard>
 
-        <GlassCard className="hover:bg-white/10 hover:border-white/20 transition-all">
+        <GlassCard className="hover:bg-gray-200 dark:bg-white/10 hover:border-gray-300 dark:border-white/20 transition-all">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-lg font-bold text-white mb-1">Sessions by Status</h3>
-              <p className="text-sm text-gray-400">Current distribution</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Sessions by Status</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Current distribution</p>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -295,11 +295,11 @@ const AnalyticsPage = () => {
       {/* Charts Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {isAdmin && (
-          <GlassCard className="hover:bg-white/10 hover:border-white/20 transition-all">
+          <GlassCard className="hover:bg-gray-200 dark:bg-white/10 hover:border-gray-300 dark:border-white/20 transition-all">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">Top Performing Mentors</h3>
-                <p className="text-sm text-gray-400">By average score</p>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Top Performing Mentors</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">By average score</p>
               </div>
               <Users className="w-6 h-6 text-green-400" />
             </div>
@@ -315,11 +315,11 @@ const AnalyticsPage = () => {
           </GlassCard>
         )}
 
-        <GlassCard className={`hover:bg-white/10 hover:border-white/20 transition-all ${!isAdmin ? 'lg:col-span-2' : ''}`}>
+        <GlassCard className={`hover:bg-gray-200 dark:bg-white/10 hover:border-gray-300 dark:border-white/20 transition-all ${!isAdmin ? 'lg:col-span-2' : ''}`}>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-lg font-bold text-white mb-1">Score Distribution</h3>
-              <p className="text-sm text-gray-400">Evaluation score ranges</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Score Distribution</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Evaluation score ranges</p>
             </div>
             <Award className="w-6 h-6 text-orange-400" />
           </div>
@@ -340,9 +340,9 @@ const AnalyticsPage = () => {
         <div className="bg-green-500/10 border border-green-500/20 backdrop-blur-sm rounded-2xl p-6 hover:bg-green-500/20 hover:border-green-500/30 transition-all">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-green-500/20 rounded-lg"><TrendingUp className="w-6 h-6 text-green-400" /></div>
-            <h3 className="text-lg font-bold text-white">Top Insight</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Top Insight</h3>
           </div>
-          <p className="text-gray-300">
+          <p className="text-gray-700 dark:text-gray-300">
             {analyticsData.averageScore >= 7
               ? 'Great work! Average scores are above 7. Keep maintaining quality teaching.'
               : 'There\'s room to improve. Focus on clarity and structure to boost your score.'}
@@ -352,9 +352,9 @@ const AnalyticsPage = () => {
         <div className="bg-blue-500/10 border border-blue-500/20 backdrop-blur-sm rounded-2xl p-6 hover:bg-blue-500/20 hover:border-blue-500/30 transition-all">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-blue-500/20 rounded-lg"><Video className="w-6 h-6 text-blue-400" /></div>
-            <h3 className="text-lg font-bold text-white">{isAdmin ? 'Most Active' : 'Your Activity'}</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{isAdmin ? 'Most Active' : 'Your Activity'}</h3>
           </div>
-          <p className="text-gray-300">
+          <p className="text-gray-700 dark:text-gray-300">
             {isAdmin
               ? `${analyticsData.mentorPerformance[0]?.name || 'N/A'} has the highest performance score this period.`
               : `You have ${analyticsData.totalSessions} session${analyticsData.totalSessions !== 1 ? 's' : ''} recorded. ${analyticsData.completionRate.toFixed(0)}% are fully evaluated.`}
@@ -364,9 +364,9 @@ const AnalyticsPage = () => {
         <div className="bg-purple-500/10 border border-purple-500/20 backdrop-blur-sm rounded-2xl p-6 hover:bg-purple-500/20 hover:border-purple-500/30 transition-all">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-purple-500/20 rounded-lg"><Target className="w-6 h-6 text-purple-400" /></div>
-            <h3 className="text-lg font-bold text-white">Goal Progress</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Goal Progress</h3>
           </div>
-          <p className="text-gray-300">
+          <p className="text-gray-700 dark:text-gray-300">
             {analyticsData.completionRate.toFixed(0)}% completion rate. Target: 85%
           </p>
         </div>
