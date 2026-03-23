@@ -34,26 +34,26 @@ const OnboardingModal = ({ user, userRole, onComplete }) => {
 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
-      <div className="bg-[#111111] border border-white/10 rounded-2xl max-w-md w-full p-8 shadow-2xl">
+      <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 rounded-2xl max-w-md w-full p-8 shadow-2xl">
         <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-6">
-          <UserIcon className="w-7 h-7 text-white" />
+          <UserIcon className="w-7 h-7 text-gray-900 dark:text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Set up your faculty profile</h2>
-        <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Set up your faculty profile</h2>
+        <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 leading-relaxed">
           We noticed your account doesn't have a faculty profile yet. Enter your name — it will be used to organise all your sessions and evaluations.
         </p>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Faculty Name <span className="text-red-400">*</span></label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Faculty Name <span className="text-red-400">*</span></label>
             <input type="text" value={facultyName} onChange={(e) => { setFacultyName(e.target.value); setError(''); }}
               onKeyDown={(e) => e.key === 'Enter' && handleSave()} placeholder="e.g. Dr. Priya Sharma" autoFocus
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+              className="w-full px-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
             />
             {error && <div className="flex items-center gap-2 mt-2 text-red-400 text-xs"><AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />{error}</div>}
           </div>
           <p className="text-xs text-gray-600 leading-relaxed">This name cannot be changed later.</p>
           <button onClick={handleSave} disabled={saving || !facultyName.trim()}
-            className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all shadow-lg flex items-center justify-center gap-2">
+            className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 dark:text-white rounded-xl font-semibold transition-all shadow-lg flex items-center justify-center gap-2">
             {saving ? <><Loader className="w-4 h-4 animate-spin" />Setting up…</> : 'Continue to Dashboard'}
           </button>
         </div>
@@ -116,7 +116,7 @@ const DashboardLayout = () => {
   };
 
   if (authLoading) {
-    return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white" /></div>;
+    return <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white" /></div>;
   }
 
   const handleStateChange = (state) => setMenuOpen(state.isOpen);
@@ -138,11 +138,11 @@ const DashboardLayout = () => {
   const isActive = (item) => location.pathname === item.href;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] relative flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] relative flex">
       {needsOnboarding && user && <OnboardingModal user={user} userRole={userRole} onComplete={() => setNeedsOnboarding(false)} />}
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-16 bg-[#111111] border-r border-white/5 flex-col items-center py-6 z-[1100]">
+      <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-16 bg-white dark:bg-[#111111] border-r border-white/5 flex-col items-center py-6 z-[1100]">
         <div className="mb-8 cursor-pointer" onClick={() => navigate('/')}>
           <img src="/logo.png" alt="Fathom" className="w-8 h-8 object-contain" />
         </div>
@@ -153,7 +153,7 @@ const DashboardLayout = () => {
               <div key={item.label} className="relative flex items-center"
                 onMouseEnter={() => setHoveredItem(item.label)} onMouseLeave={() => setHoveredItem(null)}>
                 <button onClick={() => navigate(item.href)}
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${isActive(item) ? 'bg-white text-black' : 'text-gray-500 hover:text-white hover:bg-white/10'}`}>
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${isActive(item) ? 'bg-white text-black' : 'text-gray-500 hover:text-gray-900 dark:text-white hover:bg-gray-200 dark:bg-white/10'}`}>
                   <Icon className="w-5 h-5" />
                 </button>
                 {hoveredItem === item.label && (
@@ -177,11 +177,11 @@ const DashboardLayout = () => {
 
       {/* Mobile */}
       <div className="lg:hidden fixed top-6 left-6 z-[1100]">
-        <MenuToggleIcon open={menuOpen} onClick={() => setMenuOpen(!menuOpen)} className="w-8 h-8 text-white" />
+        <MenuToggleIcon open={menuOpen} onClick={() => setMenuOpen(!menuOpen)} className="w-8 h-8 text-gray-900 dark:text-white" />
       </div>
       <div className="lg:hidden">
         <Menu isOpen={menuOpen} onStateChange={handleStateChange} width={'280px'} customBurgerIcon={false} customCrossIcon={false}>
-          <div className="px-4 pb-6 mb-6 border-b border-white/10"><h2 className="text-2xl font-bold text-white">Fathom</h2></div>
+          <div className="px-4 pb-6 mb-6 border-b border-gray-200 dark:border-white/10"><h2 className="text-2xl font-bold text-gray-900 dark:text-white">Fathom</h2></div>
           <div className="flex flex-col gap-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
