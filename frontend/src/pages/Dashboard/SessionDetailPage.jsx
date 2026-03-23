@@ -166,7 +166,7 @@ const SessionDetailPage = () => {
   };
 
   const GlassCard = ({ children, className = "" }) => (
-    <div className={`bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
+    <div className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
       {children}
     </div>
   );
@@ -192,10 +192,10 @@ const SessionDetailPage = () => {
       <div className="flex items-center justify-center h-96">
         <GlassCard className="text-center p-12">
           <Video className="w-16 h-16 mx-auto text-gray-600 mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">Session not found</h3>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Session not found</h3>
           <button
             onClick={() => navigate('/dashboard/sessions')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors mt-4"
+            className="px-6 py-3 bg-blue-600 text-gray-900 dark:text-white rounded-xl hover:bg-blue-700 transition-colors mt-4"
           >
             Back to Sessions
           </button>
@@ -210,10 +210,10 @@ const SessionDetailPage = () => {
       {/* NEW: Global Blocking Overlay */}
       {isGlobalProcessing && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center">
-          <div className="bg-gray-900 border border-white/10 p-8 rounded-2xl flex flex-col items-center max-w-md text-center shadow-2xl">
+          <div className="bg-gray-900 border border-gray-200 dark:border-white/10 p-8 rounded-2xl flex flex-col items-center max-w-md text-center shadow-2xl">
             <Loader className="w-12 h-12 text-blue-500 animate-spin mb-6" />
-            <h3 className="text-xl font-bold text-white mb-2">AI Processing in Progress</h3>
-            <p className="text-gray-300 text-lg mb-2">{processingMessage}</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">AI Processing in Progress</h3>
+            <p className="text-gray-700 dark:text-gray-300 text-lg mb-2">{processingMessage}</p>
             <p className="text-sm text-yellow-500/80 bg-yellow-500/10 px-4 py-2 rounded-lg border border-yellow-500/20 mt-4">
               Please wait. Navigating away now may cancel the process.
             </p>
@@ -228,14 +228,14 @@ const SessionDetailPage = () => {
             onClick={() => !isGlobalProcessing && navigate(-1)}
             disabled={isGlobalProcessing}
             className={`p-2 rounded-lg transition-colors mt-1 backdrop-blur-sm ${
-              isGlobalProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5'
+              isGlobalProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:bg-white/5'
             }`}
           >
-            <ArrowLeft className="w-5 h-5 text-gray-400 hover:text-white" />
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white" />
           </button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white tracking-tight mb-2">{session.title}</h1>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">{session.title}</h1>
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-2">
                 <Video className="w-4 h-4" />
                 <span>{session.topic}</span>
@@ -259,7 +259,7 @@ const SessionDetailPage = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className={`px-4 py-2 rounded-xl bg-gradient-to-r ${getStatusColor(session.status)} text-white font-semibold flex items-center gap-2 shadow-lg`}>
+          <div className={`px-4 py-2 rounded-xl bg-gradient-to-r ${getStatusColor(session.status)} text-gray-900 dark:text-white font-semibold flex items-center gap-2 shadow-lg`}>
             {session.status === 'completed' && <CheckCircle className="w-5 h-5" />}
             {session.status === 'failed' && <AlertCircle className="w-5 h-5" />}
             {['transcribing', 'analyzing'].includes(session.status) && (
@@ -285,16 +285,16 @@ const SessionDetailPage = () => {
 
       {/* Evaluation Action */}
       {session.status === 'uploaded' && !evaluation && (
-        <GlassCard className="hover:bg-white/10 transition-all">
+        <GlassCard className="hover:bg-gray-200 dark:bg-white/10 transition-all">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-white mb-1">Ready for Evaluation</h3>
-              <p className="text-gray-300">Start AI-powered analysis of this teaching session</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Ready for Evaluation</h3>
+              <p className="text-gray-700 dark:text-gray-300">Start AI-powered analysis of this teaching session</p>
             </div>
             <button
               onClick={handleStartEvaluation}
               disabled={evaluating || isGlobalProcessing}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all shadow-lg disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-xl font-semibold transition-all shadow-lg disabled:opacity-50"
             >
               {evaluating ? (
                 <>
@@ -319,8 +319,8 @@ const SessionDetailPage = () => {
             <div className="flex items-start gap-3">
               <AlertCircle className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">Evaluation Failed</h3>
-                <p className="text-gray-300">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Evaluation Failed</h3>
+                <p className="text-gray-700 dark:text-gray-300">
                   The evaluation process encountered an error. You can retry the evaluation or delete this session.
                 </p>
               </div>
@@ -328,7 +328,7 @@ const SessionDetailPage = () => {
             <button
               onClick={handleRetryEvaluation}
               disabled={evaluating || isGlobalProcessing}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all shadow-lg disabled:opacity-50 whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-xl font-semibold transition-all shadow-lg disabled:opacity-50 whitespace-nowrap"
             >
               {evaluating ? (
                 <>
@@ -348,14 +348,14 @@ const SessionDetailPage = () => {
 
       {/* Processing Status */}
       {['transcribing', 'analyzing'].includes(session.status) && (
-        <GlassCard className="hover:bg-white/10 transition-all">
+        <GlassCard className="hover:bg-gray-200 dark:bg-white/10 transition-all">
           <div className="flex items-center gap-4">
             <Loader className="w-8 h-8 text-blue-400 animate-spin" />
             <div>
-              <h3 className="text-lg font-bold text-white mb-1">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
                 {session.status === 'transcribing' ? 'Transcribing Video...' : 'Analyzing Session...'}
               </h3>
-              <p className="text-gray-300">
+              <p className="text-gray-700 dark:text-gray-300">
                 This may take a few minutes. The page will update automatically.
               </p>
             </div>
@@ -392,9 +392,9 @@ const SessionDetailPage = () => {
           </div>
 
           {/* Tabs */}
-          <div className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl overflow-hidden hover:bg-white/[0.07] hover:border-white/20 transition-all">
+          <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl overflow-hidden hover:bg-white/[0.07] hover:border-gray-300 dark:border-white/20 transition-all">
             {/* Tab Headers - Disabled during processing */}
-            <div className="flex border-b border-white/10 overflow-x-auto">
+            <div className="flex border-b border-gray-200 dark:border-white/10 overflow-x-auto">
               {tabs.filter(tab => tab.show).map((tab) => (
                 <button
                   key={tab.id}
@@ -402,10 +402,10 @@ const SessionDetailPage = () => {
                   disabled={isGlobalProcessing}
                   className={`px-6 py-4 font-medium text-sm whitespace-nowrap transition-all ${
                     activeTab === tab.id
-                      ? 'text-white border-b-2 border-blue-500 bg-blue-500/10'
+                      ? 'text-gray-900 dark:text-white border-b-2 border-blue-500 bg-blue-500/10'
                       : isGlobalProcessing 
                         ? 'text-gray-600 cursor-not-allowed'
-                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white hover:bg-gray-100 dark:bg-white/5'
                   }`}
                 >
                   {tab.label}
@@ -432,7 +432,7 @@ const SessionDetailPage = () => {
                           .filter(s => s.overall_segment_score >= 8)
                           .slice(0, 3)
                           .map((seg, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-gray-300">
+                            <li key={idx} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
                               <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                               <span>Segment {seg.segment_id + 1}: {seg.clarity.reason}</span>
                             </li>
@@ -446,7 +446,7 @@ const SessionDetailPage = () => {
                           .filter(s => s.overall_segment_score < 7)
                           .slice(0, 3)
                           .map((seg, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-gray-300">
+                            <li key={idx} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
                               <TrendingUp className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                               <span>Segment {seg.segment_id + 1}: {seg.clarity.reason}</span>
                             </li>
@@ -495,14 +495,14 @@ const SessionDetailPage = () => {
       {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl">
+          <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-md rounded-2xl max-w-md w-full p-8 shadow-2xl">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-3 bg-red-500/20 rounded-xl">
                 <Trash2 className="w-6 h-6 text-red-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Delete Session</h2>
-                <p className="text-gray-300">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Delete Session</h2>
+                <p className="text-gray-700 dark:text-gray-300">
                   Are you sure you want to delete this session? This action cannot be undone.
                 </p>
               </div>
@@ -512,7 +512,7 @@ const SessionDetailPage = () => {
               <p className="text-sm text-yellow-300">
                 <strong>Warning:</strong> This will permanently delete:
               </p>
-              <ul className="text-sm text-gray-300 mt-2 ml-4 list-disc">
+              <ul className="text-sm text-gray-700 dark:text-gray-300 mt-2 ml-4 list-disc">
                 <li>Video file</li>
                 <li>Transcription data</li>
                 <li>Evaluation results</li>
@@ -524,14 +524,14 @@ const SessionDetailPage = () => {
               <button
                 onClick={() => setShowDeleteModal(false)}
                 disabled={deleting}
-                className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all font-medium disabled:opacity-50"
+                className="flex-1 px-6 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:bg-white/10 transition-all font-medium disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteSession}
                 disabled={deleting}
-                className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-gray-900 dark:text-white rounded-xl transition-all font-medium shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {deleting ? (
                   <>
