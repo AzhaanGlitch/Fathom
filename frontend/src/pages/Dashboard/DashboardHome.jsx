@@ -133,22 +133,22 @@ const DashboardHome = () => {
   };
 
   const GlassCard = ({ children, className = '' }) => (
-    <div className={`bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
+    <div className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
       {children}
     </div>
   );
 
   const StatCard = ({ title, value, icon: Icon, trend, trendValue, colorClass }) => (
-    <GlassCard className="relative overflow-hidden group hover:bg-white/10 transition-colors">
+    <GlassCard className="relative overflow-hidden group hover:bg-gray-200 dark:bg-white/10 transition-colors">
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-2">
-          <div className={`p-2 rounded-lg bg-white/5 ${colorClass}`}>
-            <Icon className="w-5 h-5 text-white" />
+          <div className={`p-2 rounded-lg bg-gray-100 dark:bg-white/5 ${colorClass}`}>
+            <Icon className="w-5 h-5 text-gray-900 dark:text-white" />
           </div>
-          <span className="text-sm font-medium text-gray-400">{title}</span>
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</span>
         </div>
         <div className="flex items-end gap-3">
-          <h3 className="text-3xl font-bold text-white">{value}</h3>
+          <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{value}</h3>
           <div className={`flex items-center text-xs font-medium mb-1 ${trend === 'up' ? 'text-emerald-400' : 'text-red-400'}`}>
             {trend === 'up' ? <ArrowUpRight className="w-3 h-3 mr-0.5" /> : null}
             <span>{trendValue}</span>
@@ -171,10 +171,10 @@ const DashboardHome = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard Overview</h1>
-          <p className="text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Dashboard Overview</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             Welcome back,{' '}
-            <span className="text-white font-medium">
+            <span className="text-gray-900 dark:text-white font-medium">
               {isAdmin ? (user?.displayName || 'Admin') : (myMentor?.name || user?.displayName || 'User')}
             </span>.
             {!isAdmin && myMentor && (
@@ -184,7 +184,7 @@ const DashboardHome = () => {
         </div>
         <button
           onClick={() => navigate('/dashboard/sessions')}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors text-sm flex items-center gap-2 w-fit"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-lg font-medium transition-colors text-sm flex items-center gap-2 w-fit"
         >
           <Video className="w-4 h-4" />
           New Session
@@ -195,11 +195,11 @@ const DashboardHome = () => {
       {!isAdmin && myMentor && (
         <GlassCard className="flex items-center gap-4 py-4 border-blue-500/20 bg-blue-500/5">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-            <User className="w-5 h-5 text-white" />
+            <User className="w-5 h-5 text-gray-900 dark:text-white" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs text-blue-400 font-medium uppercase tracking-wider mb-0.5">Your Faculty Profile</p>
-            <p className="text-white font-semibold truncate">{myMentor.name}</p>
+            <p className="text-gray-900 dark:text-white font-semibold truncate">{myMentor.name}</p>
           </div>
           <div className="text-right flex-shrink-0">
             <p className="text-xs text-gray-500">All stats below are scoped to your profile</p>
@@ -229,12 +229,12 @@ const DashboardHome = () => {
         <GlassCard className="lg:col-span-2 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-lg font-semibold text-white">{isAdmin ? 'Platform Activity' : 'My Session Activity'}</h3>
-              <p className="text-sm text-gray-400">Overview of current metrics</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{isAdmin ? 'Platform Activity' : 'My Session Activity'}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Overview of current metrics</p>
             </div>
             <div className="flex gap-2 flex-wrap">
               {activeUsersData.map((item, i) => (
-                <div key={i} className="flex items-center gap-1.5 text-xs text-gray-400">
+                <div key={i} className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
                   {item.category}
                 </div>
@@ -264,7 +264,7 @@ const DashboardHome = () => {
 
         {/* Gauge */}
         <GlassCard className="flex flex-col items-center justify-center relative">
-          <h3 className="absolute top-6 left-6 text-lg font-semibold text-white">
+          <h3 className="absolute top-6 left-6 text-lg font-semibold text-gray-900 dark:text-white">
             {isAdmin ? 'Satisfaction' : 'My Score'}
           </h3>
           <div className="relative w-48 h-48 mt-8">
@@ -286,15 +286,15 @@ const DashboardHome = () => {
               </defs>
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-bold text-white tracking-tighter">{stats.averageScore.toFixed(1)}</span>
-              <span className="text-xs text-gray-400 uppercase tracking-wider font-medium mt-1">/ 10</span>
+              <span className="text-4xl font-bold text-gray-900 dark:text-white tracking-tighter">{stats.averageScore.toFixed(1)}</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-medium mt-1">/ 10</span>
             </div>
           </div>
           <div className="w-full mt-8 px-4">
-            <div className="flex justify-between text-xs text-gray-400 mb-2">
+            <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-2">
               <span>{isAdmin ? 'All mentors avg' : 'Your avg score'}</span>
             </div>
-            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+            <div className="h-1.5 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
               <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min(stats.averageScore * 10, 100)}%` }} />
             </div>
           </div>
@@ -303,15 +303,15 @@ const DashboardHome = () => {
 
       {/* Recent Sessions */}
       <GlassCard className="p-0 overflow-hidden">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">Recent Sessions</h3>
+        <div className="p-6 border-b border-gray-200 dark:border-white/10 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Sessions</h3>
           <button onClick={() => navigate('/dashboard/sessions')} className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
             View All
           </button>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-400">
-            <thead className="bg-white/5 text-gray-300 font-medium">
+          <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
+            <thead className="bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 font-medium">
               <tr>
                 <th className="px-6 py-4">Session Title</th>
                 <th className="px-6 py-4">Status</th>
@@ -323,8 +323,8 @@ const DashboardHome = () => {
             <tbody className="divide-y divide-white/5">
               {recentSessions.length > 0 ? (
                 recentSessions.map((session) => (
-                  <tr key={session.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4 font-medium text-white">
+                  <tr key={session.id} className="hover:bg-gray-100 dark:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                       {session.title || 'Untitled Session'}
                       <div className="text-xs text-gray-500 font-normal mt-0.5">{session.topic || 'No topic'}</div>
                     </td>
@@ -348,7 +348,7 @@ const DashboardHome = () => {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => navigate(`/dashboard/sessions/${session.id}`)}
-                        className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
+                        className="p-2 hover:bg-gray-200 dark:bg-white/10 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors"
                       >
                         <MoreVertical className="w-4 h-4" />
                       </button>
