@@ -1,4 +1,4 @@
-<img width="384" height="320" alt="image" src="https://github.com/user-attachments/assets/d2094f55-eb3a-4760-ae29-419cfec79be3" /># fathom
+# FATHOM
 
 **AI-Powered Mentor Evaluation System for Educational Excellence**
 
