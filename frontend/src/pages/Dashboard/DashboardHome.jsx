@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Video, Award, CheckCircle, Activity,
-  ArrowUpRight, Clock, Calendar, MoreVertical, User
+  ArrowUpRight, Clock, Calendar, MoreVertical, User, FileDown
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import { mentorApi, sessionApi, evaluationApi } from '../../api/client';
 import { auth } from '../../lib/firebase';
+import { downloadElementAsPDF } from '../../lib/reportGenerator';
 
 const DashboardHome = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const DashboardHome = () => {
   const [recentSessions, setRecentSessions] = useState([]);
   const [myMentor, setMyMentor] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [downloadingReport, setDownloadingReport] = useState(false);
 
   const [activeUsersData, setActiveUsersData] = useState([
     { category: 'Sessions', value: 0, color: '#8b5cf6' },
@@ -59,8 +61,12 @@ const DashboardHome = () => {
           mentorApi.getAll(),
           sessionApi.getAll(),
         ]);
-        const mentors = mentorsRes.data;
-        const sessions = sessionsRes.data;
+        
+        // Exclude solo-faculty from admin view
+        const mentors = mentorsRes.data.filter(m => m.role !== 'solo-faculty');
+        const validMentorIds = new Set(mentors.map(m => m.id || m._id));
+        const sessions = sessionsRes.data.filter(s => validMentorIds.has(s.mentor_id));
+        
         const completedSessions = sessions.filter(s => s.status === 'completed');
         const analyzingSessions = sessions.filter(s => ['analyzing', 'transcribing'].includes(s.status));
         const mentorsWithScores = mentors.filter(m => m.average_score);
@@ -132,6 +138,20 @@ const DashboardHome = () => {
     }
   };
 
+  const handleDownloadReport = async () => {
+    try {
+      setDownloadingReport(true);
+      const element = document.getElementById('dashboard-report-content');
+      const filename = isAdmin ? 'institutional_dashboard_report.pdf' : `${myMentor?.name?.replace(/\s+/g, '_') || 'faculty'}_dashboard_report.pdf`;
+      await downloadElementAsPDF(element, filename);
+    } catch (err) {
+      console.error('Failed to download report', err);
+      alert('Failed to generate report. Please try again.');
+    } finally {
+      setDownloadingReport(false);
+    }
+  };
+
   const GlassCard = ({ children, className = '' }) => (
     <div className={`bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur-sm rounded-2xl p-6 ${className}`}>
       {children}
@@ -167,7 +187,7 @@ const DashboardHome = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+    <div className="space-y-6 max-w-7xl mx-auto pb-10" id="dashboard-report-content">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -182,13 +202,23 @@ const DashboardHome = () => {
             )}
           </p>
         </div>
-        <button
-          onClick={() => navigate('/dashboard/sessions')}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-lg font-medium transition-colors text-sm flex items-center gap-2 w-fit"
-        >
-          <Video className="w-4 h-4" />
-          New Session
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleDownloadReport}
+            disabled={downloadingReport}
+            className={`px-4 py-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white border border-gray-200 dark:border-white/10 rounded-lg font-medium transition-colors text-sm flex items-center gap-2 w-fit ${downloadingReport ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <FileDown className="w-4 h-4" />
+            {downloadingReport ? 'Generating...' : 'Download Report'}
+          </button>
+          <button
+            onClick={() => navigate('/dashboard/sessions')}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white rounded-lg font-medium transition-colors text-sm flex items-center gap-2 w-fit"
+          >
+            <Video className="w-4 h-4" />
+            New Session
+          </button>
+        </div>
       </div>
 
       {/* Non-admin: faculty profile chip */}
