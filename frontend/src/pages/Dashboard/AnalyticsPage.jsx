@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  TrendingUp, Users, Video, Award, Activity, Target, User
+  TrendingUp, Users, Video, Award, Activity, Target, User, FileDown
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, AreaChart, Area,
@@ -13,9 +13,11 @@ import {
   Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { mentorApi, sessionApi, evaluationApi } from '../../api/client';
+import { downloadElementAsPDF } from '../../lib/reportGenerator';
 
 const AnalyticsPage = () => {
   const [loading, setLoading] = useState(true);
+  const [downloadingReport, setDownloadingReport] = useState(false);
   const [timeRange, setTimeRange] = useState('30d');
   const [analyticsData, setAnalyticsData] = useState({
     totalMentors: 0,
@@ -182,6 +184,20 @@ const AnalyticsPage = () => {
     },
   };
 
+  const handleDownloadReport = async () => {
+    try {
+      setDownloadingReport(true);
+      const element = document.getElementById('analytics-report-content');
+      const filename = isAdmin ? 'institutional_analytics_report.pdf' : `${myMentor?.name?.replace(/\s+/g, '_') || 'faculty'}_analytics_report.pdf`;
+      await downloadElementAsPDF(element, filename);
+    } catch (err) {
+      console.error('Failed to download report', err);
+      alert('Failed to generate report. Please try again.');
+    } finally {
+      setDownloadingReport(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -191,7 +207,7 @@ const AnalyticsPage = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+    <div className="space-y-6 max-w-7xl mx-auto pb-10" id="analytics-report-content">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -204,16 +220,26 @@ const AnalyticsPage = () => {
               : `Performance insights for ${myMentor?.name || 'your profile'}`}
           </p>
         </div>
-        <select
-          value={timeRange}
-          onChange={(e) => setTimeRange(e.target.value)}
-          className="px-4 py-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all backdrop-blur-sm"
-        >
-          <option value="7d">Last 7 days</option>
-          <option value="30d">Last 30 days</option>
-          <option value="90d">Last 90 days</option>
-          <option value="1y">Last year</option>
-        </select>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleDownloadReport}
+            disabled={downloadingReport}
+            className={`px-4 py-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white border border-gray-200 dark:border-white/10 rounded-xl font-medium transition-colors text-sm flex items-center gap-2 w-fit backdrop-blur-sm ${downloadingReport ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <FileDown className="w-4 h-4" />
+            {downloadingReport ? 'Generating...' : 'Download Report'}
+          </button>
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value)}
+            className="px-4 py-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all backdrop-blur-sm"
+          >
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
+            <option value="1y">Last year</option>
+          </select>
+        </div>
       </div>
 
       {/* Faculty profile banner */}
