@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, User, TrendingUp, TrendingDown, Minus, Search, Filter, Trash2, Loader } from 'lucide-react';
-import { mentorApi } from '../../api/client';
+import { Plus, User, TrendingUp, TrendingDown, Minus, Search, Filter, Trash2, Loader, FileDown } from 'lucide-react';
+import { mentorApi, sessionApi, evaluationApi } from '../../api/client';
+import { generatePdfFromComponent } from '../../lib/reportGenerator';
+import { MentorReportTemplate } from '../../components/MentorReportTemplate';
 
 const MentorsPage = () => {
   const navigate = useNavigate();
@@ -23,6 +25,7 @@ const MentorsPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [mentorToDelete, setMentorToDelete] = useState(null);
   const [deletingMentor, setDeletingMentor] = useState(null);
+  const [downloadingMentorId, setDownloadingMentorId] = useState(null);
 
   useEffect(() => {
     fetchMentors();
@@ -102,6 +105,57 @@ const MentorsPage = () => {
     setShowDeleteModal(true);
   };
 
+  const handleDownloadMentorReport = async (mentor, e) => {
+    e.stopPropagation();
+    try {
+      setDownloadingMentorId(mentor.id);
+      
+      const sessionsRes = await sessionApi.getAll({ mentor_id: mentor.id });
+      const sessions = sessionsRes.data;
+      
+      let avgScore = mentor.average_score || 0;
+      try {
+        const evalsRes = await evaluationApi.getAll({ mentor_id: mentor.id });
+        const evals = evalsRes.data;
+        if (evals.length > 0) {
+          avgScore = evals.reduce((sum, ev) => sum + ev.overall_score, 0) / evals.length;
+        }
+      } catch (_) { }
+
+      const completedSessions = sessions.filter(s => s.status === 'completed');
+      const analyzingSessions = sessions.filter(s => ['analyzing', 'transcribing'].includes(s.status));
+      const pendingSessions = sessions.filter(s => s.status === 'uploaded');
+
+      const stats = {
+        totalSessions: sessions.length,
+        averageScore: avgScore,
+        completedSessions: completedSessions.length
+      };
+
+      const activeUsersData = [
+        { category: 'Sessions', value: sessions.length, color: '#8b5cf6' },
+        { category: 'Completed', value: completedSessions.length, color: '#10b981' },
+        { category: 'Processing', value: analyzingSessions.length, color: '#f59e0b' },
+        { category: 'Pending', value: pendingSessions.length, color: '#6b7280' },
+      ];
+
+      const sortedSessions = [...sessions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+
+      const filename = `${mentor.name.replace(/\s+/g, '_')}_performance_report.pdf`;
+      
+      await generatePdfFromComponent(
+        MentorReportTemplate, 
+        { mentor, sessions, stats, activeUsersData, recentSessions: sortedSessions }, 
+        filename
+      );
+    } catch (error) {
+      console.error('Error generating report:', error);
+      alert('Failed to download report.');
+    } finally {
+      setDownloadingMentorId(null);
+    }
+  };
+
   const getTrendIcon = (trend) => {
     if (trend === 'improving') return <TrendingUp className="w-5 h-5 text-green-400" />;
     if (trend === 'declining') return <TrendingDown className="w-5 h-5 text-red-400" />;
@@ -149,6 +203,19 @@ const MentorsPage = () => {
           </div>
           <div className="flex items-center gap-2">
             {stats && getTrendIcon(stats.recent_trend)}
+            {/* Download Report Button */}
+            <button
+              onClick={(e) => handleDownloadMentorReport(mentor, e)}
+              disabled={downloadingMentorId === mentor.id}
+              className="p-2 hover:bg-blue-500/10 rounded-lg transition-colors border border-transparent hover:border-blue-500/20 opacity-0 group-hover:opacity-100 disabled:opacity-50"
+              title="Download Report"
+            >
+              {downloadingMentorId === mentor.id ? (
+                <Loader className="w-4 h-4 text-blue-400 animate-spin" />
+              ) : (
+                <FileDown className="w-4 h-4 text-blue-400" />
+              )}
+            </button>
             {/* NEW: Delete Button */}
             <button
               onClick={(e) => openDeleteModal(mentor, e)}
