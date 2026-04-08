@@ -13,7 +13,7 @@ import {
   Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { mentorApi, sessionApi, evaluationApi } from '../../api/client';
-import { downloadElementAsPDF } from '../../lib/reportGenerator';
+import { generateFacultyReport, generateInstitutionalReport } from '../../lib/reportGenerator';
 
 const AnalyticsPage = () => {
   const [loading, setLoading] = useState(true);
@@ -187,9 +187,30 @@ const AnalyticsPage = () => {
   const handleDownloadReport = async () => {
     try {
       setDownloadingReport(true);
-      const element = document.getElementById('analytics-report-content');
-      const filename = isAdmin ? 'institutional_analytics_report.pdf' : `${myMentor?.name?.replace(/\s+/g, '_') || 'faculty'}_analytics_report.pdf`;
-      await downloadElementAsPDF(element, filename);
+      if (isAdmin) {
+        await generateInstitutionalReport({
+          stats: {
+            totalMentors: analyticsData.totalMentors,
+            totalSessions: analyticsData.totalSessions,
+            averageScore: analyticsData.averageScore,
+            completionRate: analyticsData.completionRate,
+          },
+          mentorPerformance: analyticsData.mentorPerformance,
+          scoreDistribution: analyticsData.scoreDistribution,
+          sessionsByStatus: analyticsData.sessionsByStatus,
+          trendData: analyticsData.trendData,
+        });
+      } else {
+        await generateFacultyReport({
+          mentor: myMentor,
+          stats: {
+            totalSessions: analyticsData.totalSessions,
+            averageScore: analyticsData.averageScore,
+            completedSessions: Math.round((analyticsData.completionRate / 100) * analyticsData.totalSessions),
+          },
+          sessionBreakdown: analyticsData.sessionsByStatus?.map(s => ({ category: s.name, value: s.value, color: s.color })),
+        });
+      }
     } catch (err) {
       console.error('Failed to download report', err);
       alert('Failed to generate report. Please try again.');
