@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, User, TrendingUp, TrendingDown, Minus, Search, Filter, Trash2, Loader, FileDown } from 'lucide-react';
 import { mentorApi, sessionApi, evaluationApi } from '../../api/client';
-import { generatePdfFromComponent } from '../../lib/reportGenerator';
-import { MentorReportTemplate } from '../../components/MentorReportTemplate';
+import { generateFacultyReport } from '../../lib/reportGenerator';
 
 const MentorsPage = () => {
   const navigate = useNavigate();
@@ -132,22 +131,21 @@ const MentorsPage = () => {
         completedSessions: completedSessions.length
       };
 
-      const activeUsersData = [
+      const sessionBreakdown = [
         { category: 'Sessions', value: sessions.length, color: '#8b5cf6' },
         { category: 'Completed', value: completedSessions.length, color: '#10b981' },
         { category: 'Processing', value: analyzingSessions.length, color: '#f59e0b' },
         { category: 'Pending', value: pendingSessions.length, color: '#6b7280' },
       ];
 
-      const sortedSessions = [...sessions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+      const sortedSessions = [...sessions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 10);
 
-      const filename = `${mentor.name.replace(/\s+/g, '_')}_performance_report.pdf`;
-      
-      await generatePdfFromComponent(
-        MentorReportTemplate, 
-        { mentor, sessions, stats, activeUsersData, recentSessions: sortedSessions }, 
-        filename
-      );
+      await generateFacultyReport({
+        mentor,
+        stats,
+        sessionBreakdown,
+        recentSessions: sortedSessions,
+      });
     } catch (error) {
       console.error('Error generating report:', error);
       alert('Failed to download report.');
