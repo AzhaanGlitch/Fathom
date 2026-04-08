@@ -20,6 +20,7 @@ import {
 import { auth, googleProvider } from "../../lib/firebase";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { accessCodeApi, mentorApi } from "../../api/client";
+import OtpModal from "./OtpModal";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper: on SIGN-UP → create mentor if not existing
@@ -211,6 +212,10 @@ function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // OTP modal state
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [pendingSignUp, setPendingSignUp] = useState(null);
+
   // Character animation state
   const [mouseX, setMouseX] = useState(0);
   const [mouseY, setMouseY] = useState(0);
@@ -365,67 +370,92 @@ function LoginPage() {
 
       // Firebase auth
       let userCredential;
+
       if (isSignUp) {
+        // ── [CHANGED] Sign-up: create Firebase user, then hand off to OTP ──
         if (password !== confirmPassword) throw new Error("Passwords do not match.");
-        userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        
+        try {
+          userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        } catch (authErr) {
+          if (authErr.code === 'auth/email-already-in-use') {
+            try {
+              userCredential = await signInWithEmailAndPassword(auth, email, password);
+              if (activeRole !== "admin") {
+                const existingMentor = await findExistingMentor(userCredential.user.uid);
+                if (existingMentor) {
+                  throw new Error("An account already exists with this email. Please log in instead.");
+                }
+              }
+            } catch (loginErr) {
+              if (loginErr.message && loginErr.message.includes('account already exists')) throw loginErr;
+              throw new Error("Email already in use. Please log in instead.");
+            }
+          } else {
+            throw authErr;
+          }
+        }
+
         const displayName = activeRole === "solo-faculty" ? facultyName.trim() : name.trim();
         if (displayName) {
           await updateProfile(userCredential.user, { displayName });
         }
+
+        // Bind institution code early so it's associated with the UID
+        if (activeRole === "institution-faculty" && institutionCode.trim()) {
+          try {
+            await accessCodeApi.verify({ code_hash: institutionCode.trim(), user_uid: userCredential.user.uid });
+          } catch { /* best-effort */ }
+        }
+
+        // Compute resolved mentor name now (same logic as before)
+        const resolvedName =
+          activeRole === "institution-faculty"
+            ? (verifiedInstitution || name.trim() || email.split("@")[0])
+            : activeRole === "solo-faculty"
+              ? (facultyName.trim() || email.split("@")[0])
+              : (name.trim() || email.split("@")[0]);
+
+        // Stash everything and show OTP modal — do NOT navigate yet
+        setPendingSignUp({
+          email: email || userCredential?.user?.email,
+          userCredential,
+          resolvedName,
+          role: activeRole,
+          verifiedInstitution,
+        });
+        setShowOtpModal(true);
+        setIsLoading(false);
+        return; // ← stop here; rest runs in handleOtpVerified()
+
       } else {
+        // ── Login path: unchanged ──
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
 
       const uid = userCredential.user.uid;
 
-      // Bind institution code
+      // Bind institution code on login too
       if (activeRole === "institution-faculty" && institutionCode.trim()) {
         try {
           await accessCodeApi.verify({ code_hash: institutionCode.trim(), user_uid: uid });
         } catch { /* best-effort */ }
       }
 
-      // ── Mentor lookup / creation ──────────────────────────────────────────
-      // LOGIN:  only look up — never create a duplicate with a different name
-      // SIGNUP: create if not found
+      // Login: only look up mentor, never create
       let mentorId = null;
       if (activeRole !== "admin") {
-        if (isSignUp) {
-          const resolvedName =
-            activeRole === "institution-faculty"
-              ? (verifiedInstitution || name.trim() || email.split("@")[0])
-              : (facultyName.trim() || email.split("@")[0]);
-
-          try {
-            mentorId = await ensureMentorExists({
-              name: resolvedName,
-              email: userCredential.user.email,
-              userUid: uid,
-              role: activeRole,
-              institutionName: activeRole === "institution-faculty" ? verifiedInstitution : undefined,
-            });
-          } catch (mentorErr) {
-            console.error("Failed to create/find mentor:", mentorErr);
-          }
-        } else {
-          // Login: strictly look up, don't create
-          try {
-            mentorId = await findExistingMentor(uid);
-          } catch (mentorErr) {
-            console.error("Failed to find mentor:", mentorErr);
-          }
+        try {
+          mentorId = await findExistingMentor(uid);
+        } catch (mentorErr) {
+          console.error("Failed to find mentor:", mentorErr);
         }
       }
 
-      // Persist to localStorage
       localStorage.setItem("userRole", activeRole);
       localStorage.setItem("userId", uid);
       if (mentorId) localStorage.setItem("mentorId", mentorId);
       if (verifiedInstitution) localStorage.setItem("institutionName", verifiedInstitution);
-      if (activeRole === "solo-faculty" && isSignUp && facultyName.trim()) {
-        localStorage.setItem("facultyName", facultyName.trim());
-      }
-      // On login, restore facultyName from Firebase profile if available
       if (!isSignUp && activeRole === "solo-faculty") {
         const displayName = userCredential.user.displayName;
         if (displayName) localStorage.setItem("facultyName", displayName);
@@ -433,12 +463,77 @@ function LoginPage() {
 
       const defaultRoute = activeRole === "admin" ? "/dashboard/analytics" : "/dashboard";
       navigate(defaultRoute);
+
     } catch (err) {
       console.error("Auth error:", err);
       setError(err.message || "Failed to authenticate. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  /**
+   * Called by OtpModal when the user enters the correct code.
+   * Finishes the sign-up flow that was paused after Firebase account creation.
+   */
+  const handleOtpVerified = async () => {
+    setShowOtpModal(false);
+    if (!pendingSignUp) return;
+
+    const { userCredential, resolvedName, role, verifiedInstitution: vi } = pendingSignUp;
+    const uid = userCredential.user.uid;
+
+    try {
+      // Create mentor profile
+      let mentorId = null;
+      if (role !== "admin") {
+        try {
+          mentorId = await ensureMentorExists({
+            name: resolvedName,
+            email: userCredential.user.email,
+            userUid: uid,
+            role,
+            institutionName: role === "institution-faculty" ? vi : undefined,
+          });
+        } catch (mentorErr) {
+          console.error("Failed to create/find mentor:", mentorErr);
+        }
+      }
+
+      localStorage.setItem("userRole", role);
+      localStorage.setItem("userId", uid);
+      if (mentorId) localStorage.setItem("mentorId", mentorId);
+      if (vi) localStorage.setItem("institutionName", vi);
+      if (role === "solo-faculty" && resolvedName) {
+        localStorage.setItem("facultyName", resolvedName);
+      }
+
+      setPendingSignUp(null);
+      const defaultRoute = role === "admin" ? "/dashboard/analytics" : "/dashboard";
+      navigate(defaultRoute);
+
+    } catch (err) {
+      console.error("Post-OTP sign-up error:", err);
+      setError("Account created but setup failed. Please try logging in.");
+    }
+  };
+
+  /**
+   * Called by OtpModal when the user dismisses it (cancel / close).
+   * Deletes the just-created Firebase account so it doesn't become a ghost account.
+   */
+  const handleOtpCancel = async () => {
+    setShowOtpModal(false);
+    if (pendingSignUp?.userCredential?.user) {
+      try {
+        await pendingSignUp.userCredential.user.delete();
+        console.log("Unverified Firebase account cleaned up.");
+      } catch (err) {
+        console.warn("Could not delete unverified account:", err);
+      }
+    }
+    setPendingSignUp(null);
+    setError("Email verification was cancelled. Please try again.");
   };
 
   const handleGoogleSignIn = async () => {
@@ -463,23 +558,22 @@ function LoginPage() {
       let mentorId = null;
       if (activeRole !== "admin") {
         if (isNewUser || isSignUp) {
-          // New Google user: create mentor
+          // New Google user: show OTP first
           const resolvedName =
             activeRole === "institution-faculty"
-              ? (verifiedInstitution || userCredential.user.displayName || email.split("@")[0])
+              ? (verifiedInstitution || userCredential.user.displayName || userCredential.user.email.split("@")[0])
               : (facultyName.trim() || userCredential.user.displayName || userCredential.user.email.split("@")[0]);
 
-          try {
-            mentorId = await ensureMentorExists({
-              name: resolvedName,
-              email: userCredential.user.email,
-              userUid: uid,
-              role: activeRole,
-              institutionName: activeRole === "institution-faculty" ? verifiedInstitution : undefined,
-            });
-          } catch (mentorErr) {
-            console.error("Failed to create/find mentor:", mentorErr);
-          }
+          setPendingSignUp({
+            email: userCredential.user.email,
+            userCredential,
+            resolvedName,
+            role: activeRole,
+            verifiedInstitution,
+          });
+          setShowOtpModal(true);
+          setIsLoading(false);
+          return; // rest runs in handleOtpVerified()
         } else {
           // Returning Google user: look up only
           try {
@@ -930,6 +1024,15 @@ function LoginPage() {
           </div>
         </div>
       </div>
+
+      {showOtpModal && pendingSignUp && (
+        <OtpModal
+          email={pendingSignUp.email || pendingSignUp.userCredential?.user?.email}
+          userName={pendingSignUp.resolvedName}
+          onVerified={handleOtpVerified}
+          onCancel={handleOtpCancel}
+        />
+      )}
     </div>
   );
 }
