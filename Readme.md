@@ -2,489 +2,468 @@
 
 **AI-Powered Mentor Evaluation System for Educational Excellence**
 
-An explainable evaluation platform that analyzes teaching sessions using advanced LLMs. Upload videos, get detailed feedback across multiple dimensions (clarity, structure, correctness, pacing, communication, engagement, examples, questioning, adaptability, and relevance), and receive actionable insights to improve teaching quality at scale.
+An explainable evaluation platform that analyzes teaching sessions using a multi-layer LLM council architecture. Upload videos, receive detailed feedback across ten dimensions (clarity, structure, correctness, pacing, communication, engagement, examples, questioning, adaptability, and relevance), and get actionable insights to improve teaching quality at scale.
 
-[![Frontend](https://img.shields.io/badge/Frontend-Live%20on%20Vercel-00C7B7?style=for-the-badge&logo=vercel)](https://fathom-murex.vercel.app/)
-[![Backend](https://img.shields.io/badge/Backend-Deployed%20on%20HuggingFace-FFD21E?style=for-the-badge&logo=huggingface)](https://huggingface.co/spaces/ParthG2209/fathom)
-
-![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat&logo=react&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688?style=flat&logo=fastapi&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat&logo=mongodb&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.3.5-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
-![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=flat&logo=google&logoColor=white)
-![Groq](https://img.shields.io/badge/Groq-LLaMA_3.3_70B-FF6F00?style=flat&logo=meta&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-Auth-FFCA28?style=flat&logo=firebase&logoColor=white)
-![D3.js](https://img.shields.io/badge/D3.js-7.8.5-F9A03C?style=flat&logo=d3dotjs&logoColor=white)
-![Recharts](https://img.shields.io/badge/Recharts-2.15.4-8884D8?style=flat)
-![Framer Motion](https://img.shields.io/badge/Framer_Motion-12.23.25-0055FF?style=flat&logo=framer&logoColor=white)
-![Three.js](https://img.shields.io/badge/Three.js-r128-000000?style=flat&logo=threedotjs&logoColor=white)
 
 ---
 
-> [!NOTE]
-> **🚧 Beta Access & Data Notice**
-> 
-> The current deployed version is running in **Admin Mode** by default for testing purposes.
-> * **Permissions:** You have full access to **add or delete mentors** and view **any teaching session** on the platform.
-> * **Data Authenticity:** The data currently populated in the dashboard is **100% real evaluation data** processed by our AI pipeline. These are actual AI-generated evaluations, rewrites, and coherence checks—not static demo placeholders and you can add your own mentors and sessions and evaluate them.
+> **Beta Access and Data Notice**
+>
+> The current deployed version is running in Admin Mode by default for testing purposes. You have full access to add or delete mentors and view any teaching session on the platform. The data currently populated in the dashboard is real evaluation data processed by the AI pipeline. These are actual AI-generated evaluations, rewrites, and coherence checks, not static demo placeholders. You can add your own mentors and sessions and evaluate them.
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [LLM Council Architecture](#llm-council-architecture)
+3. [Target Audience](#target-audience)
+4. [Features](#features)
+5. [Role-Based Access System](#role-based-access-system)
+6. [Technology Stack](#technology-stack)
+7. [Architecture](#architecture)
+8. [Installation](#installation)
+9. [Configuration](#configuration)
+10. [API Documentation](#api-documentation)
+11. [Deployment](#deployment)
+12. [Performance Benchmarks](#performance-benchmarks)
+13. [Roadmap](#roadmap)
+14. [Contributing](#contributing)
+15. [Contact](#contact)
+
+---
+
+## Overview
+
+Fathom transforms teaching evaluation by providing:
+
+- **AI-Powered Analysis**: Multi-dimensional evaluation using a four-layer LLM council system
+- **Explainable Insights**: Evidence-based feedback with specific problematic phrases identified
+- **Smart Rewrites**: AI-generated improvements for unclear explanations
+- **Coherence Checking**: Detection of contradictions, topic drift, and logical gaps
+- **Visual Analytics**: Interactive charts and performance tracking dashboards
+- **Real-time Processing**: Automated video transcription and segment analysis
+- **Advanced Metrics**: Ten-dimensional evaluation covering all aspects of teaching quality
+
+---
+
+## LLM Council Architecture
+
+Fathom uses a four-layer LLM council system to deliver subject-appropriate evaluations. This architecture ensures that the most capable model for a given academic domain is applied to each teaching session.
+
+### How It Works
+
+When a session's transcribed data is ready for evaluation, it is first passed to the **Master LLM (LLaMA 3.3 70B via Groq)**, which acts as the orchestrator. This master model analyzes the session content and categorizes the subject matter into one of three broad domains.
+
+**Subject Categorization Examples:**
+
+| Category | Subjects |
+|----------|----------|
+| Heavy Technical (Programming and Mathematics) | Data Structures and Algorithms, Operating Systems, DBMS, Machine Learning, Calculus, Linear Algebra, Probability and Statistics |
+| Deep Research (Complex Academic) | Advanced Engineering, Physics, Cognitive Science, Formal Logic, Research Methodology |
+| General and Literary | English, Emotional Intelligence, History, Psychology, Basic General Knowledge, Soft Skills |
+
+Once categorization is complete, the session data is routed to the appropriate layer. Each specialist layer produces its own independent analysis covering coherence, evidence extraction, rewrites, and evaluation scores. The master LLM then reviews the outputs from the specialist models and selects the most accurate and insightful evaluation before returning results to the platform.
+
+---
+
+### Layer 1: Heavy Technical Subjects
+
+**Trigger:** Programming, algorithms, mathematics, and computationally intensive subjects.
+
+**Models Used:**
+- MiniMax-01 (via OpenRouter)
+- Claude Sonnet 4.6 (via OpenRouter)
+
+Both models independently evaluate the segment across all ten metrics. The master LLM (LLaMA) then compares their outputs and selects the superior evaluation, or synthesizes the best elements of both responses into a final consolidated result.
+
+---
+
+### Layer 2: Deep Research and Complex Academic Subjects
+
+**Trigger:** Subjects requiring deep cognitive reasoning such as advanced physics, formal mathematics, engineering theory, and research-intensive topics.
+
+**Models Used:**
+- Gemini 2.5 Flash (via Google)
+- Qwen 2.5 72B Instruct (via OpenRouter)
+
+The same peer-review process applies. Both models produce evaluations independently, and the master LLM selects the better output.
+
+---
+
+### Layer 3: General and Literary Subjects
+
+**Trigger:** Softer academic subjects, language instruction, social sciences, and general knowledge topics where deep technical reasoning is not required.
+
+**Model Used:**
+- OpenAI GPT-5 (via OpenRouter)
+
+This layer uses a single high-capability general-purpose model suited to humanistic and conversational content.
+
+---
+
+### Master LLM Role
+
+The master model (LLaMA 3.3 70B) serves two functions:
+
+1. **Categorization:** Classifies the incoming session into one of the three subject domains before routing to the appropriate layer.
+2. **Review and Selection:** After specialist models return their evaluations, the master LLM reviews all outputs and produces a final JSON evaluation representing the most accurate and insightful assessment. If one specialist model fails or returns an invalid response, the master LLM falls back to the remaining valid output.
+
+### Council Flow Diagram
+
+```
+Session Transcript
+        |
+        v
+Master LLM (LLaMA 3.3 70B)
+  [Categorizes subject domain]
+        |
+   _____|______________________
+  |           |                |
+  v           v                v
+Layer 1    Layer 2          Layer 3
+(Heavy     (Deep            (General)
+Technical) Research)
+MiniMax +  Gemini +         GPT-5
+Claude     Qwen
+  |           |                |
+  v           v                v
+[Both models evaluate independently]
+        |
+        v
+Master LLM Reviews All Outputs
+        |
+        v
+Final Evaluation JSON -> Platform
+```
 
 ---
 
 ## Target Audience
 
-fathom is specifically designed for:
+Fathom is designed for organizations that conduct teaching evaluations at scale.
 
-### Large Universities & Educational Institutions
-- **Multi-Department Deployment**: Manage hundreds of instructors across various departments
-- **Scalable Assessment**: Evaluate thousands of teaching sessions simultaneously
-- **Institutional Analytics**: Track teaching quality trends across entire universities
-- **Faculty Development Programs**: Provide data-driven feedback for instructor improvement
+**Large Universities and Educational Institutions:** Multi-department deployment for managing hundreds of instructors, tracking teaching quality trends, and supporting faculty development programs.
 
-### Educational Organizations
-- **Professional Development Centers**: Training organizations evaluating instructor effectiveness
-- **Corporate Training Departments**: Companies with large-scale training programs
-- **Online Education Platforms**: MOOCs and e-learning platforms needing quality assurance
-- **Educational Technology Companies**: EdTech companies building teaching quality tools
+**Educational Organizations:** Professional development centers, corporate training departments evaluating instructor effectiveness, and online education platforms requiring quality assurance.
 
-### Use Case Examples
-- **Stanford University**: Evaluating 500+ TAs across Computer Science courses
-- **Corporate Training**: Assessing 200+ trainers in global workforce development
-- **Medical Schools**: Quality assurance for clinical teaching and patient education
-- **Teacher Certification Programs**: Standardized evaluation for educator licensing
+**Use Case Examples:**
+- Evaluating 500+ teaching assistants across Computer Science courses in a university
+- Assessing trainers across global workforce development programs
+- Quality assurance for clinical teaching in medical schools
+- Standardized evaluation for educator licensing and certification programs
 
 ---
 
-## Live Demo
-
-- **Frontend Application**: [https://fathom-murex.vercel.app/](https://fathom-murex.vercel.app/)
-- **Backend API**: [https://huggingface.co/spaces/ParthG2209/fathom](https://huggingface.co/spaces/ParthG2209/fathom)
-- **API Documentation**: [Backend URL]/docs
-
----
-
-##  Overview
-
-fathom transforms teaching evaluation by providing:
-- **🤖 AI-Powered Analysis**: Multi-dimensional evaluation using Google Gemini & Groq LLMs
-- **🔍 Explainable Insights**: Evidence-based feedback with specific problematic phrases
-- **✍️ Smart Rewrites**: AI-generated improvements for unclear explanations
-- **🔗 Coherence Checking**: Detects contradictions, topic drift, and logical gaps
-- **📊 Visual Analytics**: Interactive charts and performance tracking
-- **⚡ Real-time Processing**: Automated video transcription and segment analysis
-- **🎯 Advanced Metrics**: 10-dimensional evaluation including engagement, questioning, adaptability
-
----
-
----
-
-## 🔐 Role-Based Access System
-
-fathom supports a **multi-role authentication system**, enabling customized experiences for administrators and educators at different levels.
-
----
-
-### Administrator Access
-
-- Dedicated **Admin Login Portal**
-- Secure login using:
-  - Admin Access Code
-  - Email & Password
-- Full platform control:
-  - Add, update, and delete mentors
-  - Access all teaching sessions across the institution
-  - View complete analytics and evaluation reports
-  - Monitor overall teaching quality trends
-
----
-
-### Faculty / Teacher Access
-
-Faculty users are categorized into two types:
-
-#### Institutional Faculty
-
-- Login using:
-  - **Institution Code** (provided by administrator)
-  - Email
-- Access permissions:
-  - View and manage their own sessions
-  - Access institution-level insights (based on permissions)
-- Ideal for:
-  - Universities and large educational institutions
-  - Structured faculty evaluation systems
-
----
-
-#### Independent Educators (Solo Faculty)
-
-- Direct login using:
-  - Email & Password
-- No institution required
-- Use-cases:
-  - Self-evaluation of teaching sessions
-  - Personal performance tracking
-  - Continuous skill improvement using AI feedback
-
----
-
-### Why This Matters
-
-This feature makes fathom highly flexible and scalable:
-
-- **Institutions** → Centralized control and analytics
-- **Faculty** → Personalized feedback and improvement
-- **EdTech Platforms** → Supports multiple users and institutions on a single platform
-
-By supporting both **large scale institution** and **individual educators**, fathom connects institutional scale with personalized teaching improvement.
-
----
-
-## Scalability & Performance
-
-### Architecture for Scale
-
-**Horizontal Scaling**
-- FastAPI backend with async/await for concurrent request handling
-- MongoDB with sharding support for distributed data storage
-- Stateless API design enabling load balancing across multiple instances
-- CDN integration (Vercel Edge Network) for global content delivery
-
-**Performance Metrics**
-- **Concurrent Users**: 10,000+ simultaneous users supported
-- **Video Processing**: 100+ videos can be transcribed in parallel
-- **API Response Time**: < 200ms average for evaluation retrieval
-- **Database Queries**: Optimized indexes for sub-50ms query times
-
-**Resource Optimization**
-- Lazy loading for frontend components (React.lazy + Suspense)
-- Video streaming instead of full download (chunk-based processing)
-- LLM request batching to minimize API calls
-- Database connection pooling with Motor async driver
-- Efficient React rendering with memo and useMemo hooks
-
-### Scaling Strategies
-
-**Application Layer**
-```
-Load Balancer (Nginx/AWS ALB)
-    ↓
-FastAPI Instance 1 ← → MongoDB Replica Set (Primary)
-FastAPI Instance 2 ← → MongoDB Replica Set (Secondary 1)
-FastAPI Instance 3 ← → MongoDB Replica Set (Secondary 2)
-```
-
-**Data Layer**
-- **MongoDB Sharding**: Partition data by mentor_id or institution_id
-- **Read Replicas**: Distribute read queries across secondary nodes
-- **Caching Layer**: Redis for frequently accessed evaluation results
-- **File Storage**: S3/Cloud Storage for video files with pre-signed URLs
-
-**LLM Processing**
-- Rate limiting and queue management for LLM API calls
-- Fallback strategy: Gemini (primary) → Groq (secondary) → Mock (testing)
-- Batch processing for multiple segment evaluations
-- Asynchronous background tasks (FastAPI BackgroundTasks)
-
-**Deployment Architecture**
-```
-Client (React) → CDN (Vercel) → API Gateway
-                                    ↓
-                            Load Balancer
-                                    ↓
-                    ┌───────────────┴───────────────┐
-                    ↓                               ↓
-            FastAPI Cluster                 Worker Cluster
-            (Hugging Face Spaces)      (Background Processing)
-                    ↓                               ↓
-                MongoDB Atlas              Google Gemini API
-            (Auto-scaling enabled)          Groq API
-```
-
-**Cost Efficiency**
-- Free-tier LLM usage (Gemini 2.5 Flash, Groq LLaMA 3.3)
-- Serverless deployment reducing idle costs
-- Efficient video compression before storage
-- Incremental static regeneration (ISR) for frontend
-
----
-
-## Current Features (Fully Functional)
+## Features
 
 ### Core Evaluation System
-- **Multi-Dimensional Scoring**: Evaluates teaching across **10 key metrics**
-  - **Core Metrics** (Traditional - 75% weight):
-    - Clarity (25% weight)
-    - Structure (20% weight)
-    - Correctness (25% weight)
-    - Pacing (15% weight)
-    - Communication (15% weight)
-  - **Advanced Metrics** (New - 25% weight):
-    - Engagement (10% weight) - Interactive elements and energy
-    - Examples (10% weight) - Quality and relevance of illustrations
-    - Questioning (8% weight) - Socratic method and comprehension checks
-    - Adaptability (8% weight) - Adjusting to content difficulty
-    - Relevance (9% weight) - Topic alignment and educational merit
-- **Segment-by-Segment Analysis**: Breaks down sessions into logical teaching units
-- **Automated Transcription**: Converts video to timestamped text segments using Google Gemini
-- **LLM-Powered Evaluation**: Uses Google Gemini 2.5 Flash for accurate, explainable feedback
-- **Topic Validation**: Ensures content relevance to stated learning objectives
 
-### Mentor Management
-- **Create & Manage Mentors**: Add mentors with expertise, bio, and contact information
-- **Performance Tracking**: Track mentor performance over time with trend analysis
-- **Session History**: View all sessions associated with each mentor
-- **Statistics Dashboard**: Average scores, total sessions, and performance trends
-- **Comparative Analytics**: Benchmark mentors against institutional averages
+**Multi-Dimensional Scoring across ten metrics:**
 
-### Session Management
-- **Video Upload**: Support for MP4, MOV, AVI, MKV formats (up to 500MB)
-- **Session Metadata**: Title, topic, duration, and mentor assignment
-- **Status Tracking**: Real-time status updates (Uploaded → Transcribing → Analyzing → Completed)
-- **Session Details**: Comprehensive view with evaluation results and visualizations
-- **Batch Upload**: Process multiple sessions simultaneously
+Core Metrics (75% weight):
+- Clarity (25%)
+- Structure (20%)
+- Correctness (25%)
+- Pacing (15%)
+- Communication (15%)
 
-### Visual Analytics
-- **Interactive Dashboard**: Real-time metrics and performance overview
-- **Explanation Flow Graphs**: Visual representation of teaching quality progression (D3.js)
-- **Performance Charts**: Line charts, bar charts, and area charts using Recharts
-- **Score Distribution**: Visualize score ranges and trends
-- **Comparative Analytics**: Compare mentor performance across sessions
-- **3D Visualizations**: Three.js-powered interactive data exploration
+Advanced Metrics (25% weight):
+- Engagement (10%)
+- Examples (10%)
+- Questioning (8%)
+- Adaptability (8%)
+- Relevance (9%)
 
-### Authentication & Security
-- **Firebase Authentication**: Email/password and Google OAuth sign-in
-- **Protected Routes**: Secure dashboard and evaluation features
-- **User Profiles**: Personalized user experience with profile management
-- **Role-Based Access**: Admin and user permission levels
+**Segment-by-Segment Analysis:** Breaks sessions into logical teaching units for granular feedback.
+
+**Automated Transcription:** Converts video to timestamped text segments using Google Gemini 2.5 Flash.
+
+**Topic Validation:** Ensures content relevance to stated learning objectives.
 
 ### Evidence Extraction
-- **Problematic Phrase Detection**: Identify exact text causing low scores
-- **Character-Level Precision**: Pinpoint issues with start/end positions
-- **Issue Classification**: Categorize by severity (minor, moderate, major)
-- **Alternative Phrasing**: Suggest better ways to express concepts
-- **Contextual Feedback**: Explain why specific phrases are problematic
+
+- Identification of exact problematic phrases with character-level precision
+- Issue classification by severity (minor, moderate, major)
+- Contextual explanation of why specific phrases are problematic
+- Distinction between diagnostic evidence and prescriptive suggestions
 
 ### Explanation Rewriting
-- **AI-Powered Rewrites**: Generate improved versions of low-scoring explanations
-- **Improvement Tracking**: Show specific changes and score improvements
-- **Multiple Versions**: Generate alternative rewrites for comparison
-- **Confidence Scoring**: Indicate reliability of suggested improvements
-- **Before/After Comparison**: Side-by-side view of original vs. rewritten
-- **Teaching Style Transfer**: Apply Socratic method and analogical reasoning
+
+- AI-generated rewrites that apply Socratic questioning and analogical reasoning
+- Before and after comparison views
+- Specific correction notes and strategic teaching suggestions
+- Confidence scoring for each rewrite
 
 ### Coherence Analysis
-- **Contradiction Detection**: Find statements that conflict with each other
-- **Topic Drift Identification**: Detect when explanations stray off-topic
-- **Logical Gap Analysis**: Identify missing steps or unexplained concepts
-- **Session-Wide Coherence Score**: Overall measure of logical consistency
-- **Resolution Suggestions**: Recommendations for fixing coherence issues
-- **Macro-Structure Analysis**: Evaluate teaching flow and narrative arc
+
+- Contradiction detection between segments
+- Topic drift identification
+- Logical gap analysis for missing steps or unexplained concepts
+- Session-wide coherence scoring
+- Resolution suggestions for each issue found
+
+### Mentor Management
+
+- Create and manage mentor profiles with expertise and bio information
+- Performance tracking over time with trend analysis
+- Session history per mentor
+- Statistics dashboard with average scores and performance trends
+- Comparative analytics against institutional averages
+
+### Session Management
+
+- Video upload supporting MP4, MOV, AVI, and MKV formats up to 500MB
+- Real-time status tracking through the pipeline: Uploaded, Transcribing, Analyzing, Completed
+- Batch upload capability for processing multiple sessions simultaneously
+
+### Visual Analytics
+
+- Interactive dashboard with real-time metrics
+- Explanation flow graphs using D3.js
+- Performance charts using Recharts
+- Score distribution visualization
+- Three.js-powered 3D data exploration
+
+### Authentication and Security
+
+- Firebase Authentication with email/password and Google OAuth
+- Protected routes and role-based access control
+- OTP email verification on account creation
+- Multi-role system supporting Admin, Institution Faculty, and Solo Faculty
+
+### PDF Report Generation
+
+- Individual faculty performance reports with charts and session history
+- Institutional analytics reports with trend data, score distribution, and top performer rankings
+- All reports generated client-side using jsPDF and jspdf-autotable
 
 ---
 
-##  Coming Soon (Under Development)
+## Role-Based Access System
 
-### Advanced Analytics
-- 🚧 **Predictive Insights**: ML-based predictions for mentor improvement trajectories
-- 🚧 **Comparative Benchmarking**: Compare against industry standards and peer institutions
-- 🚧 **Custom Reports**: Generate PDF reports for stakeholders and accreditation
-- 🚧 **Export Functionality**: Download data in CSV/JSON formats for external analysis
-- 🚧 **Real-time Dashboards**: Live monitoring of evaluation pipeline status
+### Administrator
 
-### UI/UX Enhancements
-- 🚧 **Dark Mode Persistence**: Save theme preference across sessions
-- 🚧 **Mobile Optimization**: Enhanced responsive design for all devices
-- 🚧 **Keyboard Shortcuts**: Power user features for faster navigation
-- 🚧 **Accessibility Improvements**: WCAG 2.1 Level AA compliance
-- 🚧 **Custom Themes**: Institutional branding and color schemes
+- Secure login using Admin Access Code, email, and password
+- Full platform control: add, update, delete mentors
+- Access to all teaching sessions across the institution
+- Complete analytics and evaluation reports
+- Admin tools for database maintenance and deduplication
 
----
+### Institution Faculty
 
-## Architecture
+- Login using Institution Code (provided by administrator) and email
+- Access scoped to their own sessions and evaluations
+- Personal analytics dashboard
 
-### Backend (FastAPI + Python)
-```
-backend/
-├── main.py                          # FastAPI application entry point
-├── config.py                        # Configuration & environment variables
-├── db.py                           # MongoDB async client setup
-├── requirements.txt                # Python dependencies
-├── Dockerfile                      # Docker container configuration
-│
-├── models/                         # Pydantic data models
-│   ├── mentor.py                  # Mentor profile and stats
-│   ├── session.py                 # Session with video metadata
-│   ├── transcript.py              # Transcript with segments
-│   ├── evaluation.py              # Evaluation scores and metrics (10 dimensions)
-│   ├── evidence.py                # Evidence extraction
-│   ├── rewrite.py                 # Explanation rewrites
-│   └── coherence.py               # Coherence analysis
-│
-├── routes/                         # API endpoint handlers
-│   ├── mentors.py                 # Mentor CRUD operations
-│   ├── sessions.py                # Session management
-│   ├── evaluations.py             # Evaluation orchestration
-│   ├── evidence.py                # Evidence endpoints
-│   ├── rewrites.py                # Rewrite endpoints
-│   └── coherence.py               # Coherence endpoints
-│
-├── services/                       # Business logic layer
-│   ├── llm_evaluator.py           # Core LLM-based evaluation (10 metrics)
-│   ├── transcription.py           # Video-to-text conversion (Gemini)
-│   ├── segmentation.py            # Logical segment detection
-│   ├── scoring.py                 # Score aggregation & weighted metrics
-│   ├── evidence_extractor.py      # Extract problematic phrases
-│   ├── explanation_rewriter.py    # Generate improvements with style transfer
-│   └── coherence_checker.py       # Detect logical issues and drift
-│
-└── utils/                          # Utility functions
-    ├── llm_client.py              # Unified LLM interface (Gemini/Groq/Mock)
-    ├── file_handler.py            # File upload/storage handling
-    └── auth.py                    # Firebase authentication helpers
-```
+### Solo Faculty (Independent Educators)
 
-### Frontend (React + TailwindCSS)
-```
-frontend/
-├── src/
-│   ├── App.jsx                     # Main app component & routing
-│   ├── index.jsx                   # React entry point
-│   │
-│   ├── components/                 # Reusable UI components
-│   │   ├── MentorCard.jsx          # Mentor display card
-│   │   ├── SessionCard.jsx         # Session display card
-│   │   ├── MetricCard.jsx          # Score metric card (10 metrics)
-│   │   ├── SegmentList.jsx         # Expandable segment list
-│   │   ├── ExplanationGraph.jsx    # D3.js flow visualization
-│   │   ├── EvidencePanel.jsx       # Evidence UI
-│   │   ├── RewriteComparison.jsx   # Before/after comparison
-│   │   ├── CoherenceIssuesViewer.jsx # Coherence display
-│   │   └── ui/                     # Shadcn/UI components
-│   │       ├── animated-hero.jsx   # Landing page hero
-│   │       ├── animated-characters-login-page.jsx # Auth UI
-│   │       ├── container-scroll-animation.jsx
-│   │       ├── sparkles.jsx        # Particle effects
-│   │       ├── grid-background.jsx # Grid pattern
-│   │       └── modern-animated-footer.jsx
-│   │
-│   ├── pages/Dashboard/            # Dashboard pages
-│   │   ├── DashboardHome.jsx       # Overview with stats
-│   │   ├── MentorsPage.jsx         # Mentor management
-│   │   ├── SessionsPage.jsx        # Session list and upload
-│   │   ├── SessionDetailPage.jsx   # Detailed session view
-│   │   ├── AnalyticsPage.jsx       # Performance analytics (Recharts)
-│   │   ├── ProfilePage.jsx         # User profile
-│   │   └── SettingsPage.jsx        # App settings
-│   │
-│   ├── layouts/                    # Layout components
-│   │   └── DashboardLayout.jsx     # Sidebar + header layout
-│   │
-│   ├── api/                        # API client
-│   │   └── client.js               # Axios HTTP client + endpoints
-│   │
-│   ├── lib/                        # Utility libraries
-│   │   ├── firebase.js             # Firebase configuration
-│   │   └── utils.js                # Utility functions
-│   │
-│   └── styles/                     # Global styles
-│       ├── index.css               # Tailwind directives
-│       └── burger-menu.css         # Sidebar menu styles
-│
-└── public/
-    └── index.html                  # HTML entry point
-```
+- Direct login using email and password without an institution
+- Personal session management and performance tracking
+- Self-evaluation use case without institutional overhead
 
 ---
 
 ## Technology Stack
 
-### Backend Technologies
-- **Framework**: FastAPI 0.104.1 (async Python web framework)
-- **Database**: MongoDB Atlas (with Motor 3.6.0 async driver)
-- **LLM Integration**: 
-  - Google Gemini 2.5 Flash (primary, free tier)
-  - Groq LLaMA 3.3 70B (secondary, free tier)
-- **Video Processing**: Google Gemini for transcription
-- **Authentication**: Firebase Auth (email/password + Google OAuth)
-- **Validation**: Pydantic v2.5.0
-- **HTTP Client**: httpx 0.25.1 (async)
-- **Deployment**: Hugging Face Spaces (Docker-based)
-- **Text Processing**: NLTK 3.8.1
-- **File Handling**: aiofiles 23.2.1
+### Backend
 
-### Frontend Technologies
-- **Framework**: React 18.2.0
-- **Routing**: React Router v6.20.0
-- **Styling**: TailwindCSS 3.3.5
-- **UI Components**: Radix UI + shadcn/ui
-- **Charts**: Recharts 2.15.4 + D3.js 7.8.5
-- **3D Graphics**: Three.js r128
-- **Animations**: Framer Motion 12.23.25
-- **Icons**: Lucide React 0.263.1
-- **Authentication**: Firebase SDK 12.6.0
-- **HTTP Client**: Axios 1.6.2
-- **Particles**: @tsparticles/react 3.0.0
-- **Deployment**: Vercel (Edge Network)
+| Component | Technology |
+|-----------|------------|
+| Framework | FastAPI 0.104.1 |
+| Database | MongoDB Atlas with Motor 3.6.0 async driver |
+| Primary LLM | Google Gemini 2.5 Flash |
+| Orchestrator LLM | Groq LLaMA 3.3 70B |
+| Specialist LLMs | MiniMax-01, Claude Sonnet 4.6, Qwen 2.5 72B, GPT-5 via OpenRouter |
+| Video Transcription | Google Gemini |
+| Authentication | Firebase Auth |
+| Validation | Pydantic v2.5.0 |
+| HTTP Client | httpx 0.25.1 |
+| Deployment | Hugging Face Spaces (Docker) |
+| Text Processing | NLTK 3.8.1 |
 
-### Development Tools
-- **Python**: 3.11+
-- **Node.js**: 18+
-- **Package Managers**: pip, npm
-- **Version Control**: Git
-- **CI/CD**: Vercel (frontend), Hugging Face Spaces (backend)
+### Frontend
+
+| Component | Technology |
+|-----------|------------|
+| Framework | React 18.2.0 |
+| Routing | React Router v6.20.0 |
+| Styling | TailwindCSS 3.3.5 |
+| UI Components | Radix UI + shadcn/ui |
+| Charts | Recharts 2.15.4 + D3.js 7.8.5 |
+| 3D Graphics | Three.js r128 |
+| Animations | Framer Motion 12.23.25 |
+| PDF Generation | jsPDF + jspdf-autotable |
+| Authentication | Firebase SDK 12.6.0 |
+| HTTP Client | Axios 1.6.2 |
+| Deployment | Vercel (Edge Network) |
+
+---
+
+## Architecture
+
+### Backend Structure
+
+```
+backend/
+├── main.py                          # FastAPI application entry point
+├── config.py                        # Configuration and environment variables
+├── db.py                            # MongoDB async client setup
+├── requirements.txt                 # Python dependencies
+├── Dockerfile                       # Docker container configuration
+│
+├── models/                          # Pydantic data models
+│   ├── mentor.py                    # Mentor profile and stats
+│   ├── session.py                   # Session with video metadata
+│   ├── transcript.py                # Transcript with segments
+│   ├── evaluation.py                # Evaluation scores and metrics (10 dimensions)
+│   ├── evidence.py                  # Evidence extraction
+│   ├── rewrite.py                   # Explanation rewrites
+│   └── coherence.py                 # Coherence analysis
+│
+├── routes/                          # API endpoint handlers
+│   ├── mentors.py                   # Mentor CRUD operations
+│   ├── sessions.py                  # Session management
+│   ├── evaluations.py               # Evaluation orchestration
+│   ├── evidence.py                  # Evidence endpoints
+│   ├── rewrites.py                  # Rewrite endpoints
+│   └── coherence.py                 # Coherence endpoints
+│
+├── services/                        # Business logic layer
+│   ├── council_evaluator.py         # LLM council orchestration (master + layers)
+│   ├── llm_evaluator.py             # Base LLM evaluation service
+│   ├── transcription.py             # Video-to-text conversion (Gemini)
+│   ├── segmentation.py              # Logical segment detection
+│   ├── scoring.py                   # Score aggregation and weighted metrics
+│   ├── evidence_extractor.py        # Extract problematic phrases
+│   ├── explanation_rewriter.py      # Generate improvements with style transfer
+│   └── coherence_checker.py        # Detect logical issues and drift
+│
+└── utils/                           # Utility functions
+    ├── llm_client.py                # Unified LLM interface (Gemini, Groq, OpenRouter)
+    ├── file_handler.py              # File upload and storage handling
+    └── auth.py                      # Firebase authentication helpers
+```
+
+### Frontend Structure
+
+```
+frontend/
+├── src/
+│   ├── App.jsx                      # Main app component and routing
+│   │
+│   ├── components/                  # Reusable UI components
+│   │   ├── MentorCard.jsx
+│   │   ├── SessionCard.jsx
+│   │   ├── MetricCard.jsx
+│   │   ├── SegmentList.jsx
+│   │   ├── ExplanationGraph.jsx     # D3.js flow visualization
+│   │   ├── EvidencePanel.jsx
+│   │   ├── RewriteComparison.jsx
+│   │   └── CoherenceIssuesViewer.jsx
+│   │
+│   ├── pages/Dashboard/             # Dashboard pages
+│   │   ├── DashboardHome.jsx
+│   │   ├── MentorsPage.jsx
+│   │   ├── SessionsPage.jsx
+│   │   ├── SessionDetailPage.jsx
+│   │   ├── AnalyticsPage.jsx
+│   │   ├── AccessCodeGenerator.jsx
+│   │   ├── AdminToolsPage.jsx
+│   │   ├── ProfilePage.jsx
+│   │   └── SettingsPage.jsx
+│   │
+│   ├── layouts/
+│   │   └── DashboardLayout.jsx      # Sidebar and header layout
+│   │
+│   ├── api/
+│   │   └── client.js                # Axios HTTP client and endpoints
+│   │
+│   ├── lib/
+│   │   ├── firebase.js              # Firebase configuration
+│   │   ├── reportGenerator.js       # PDF report generation engine
+│   │   └── utils.js                 # Utility functions
+│   │
+│   └── contexts/
+│       └── ThemeContext.jsx         # Dark/light mode state
+```
+
+### LLM Client Architecture
+
+The `UnifiedLLMClient` in `backend/utils/llm_client.py` provides a single interface to all LLM providers. Task routing is configurable, and the client supports automatic fallback between providers on rate limit or failure. All JSON responses are cleaned and parsed with error recovery.
+
+```
+UnifiedLLMClient
+├── _call_gemini()        # Google Gemini API
+├── _call_groq()          # Groq API (LLaMA 3.3 70B)
+├── _call_openrouter()    # OpenRouter (MiniMax, Claude, Qwen, GPT-5)
+└── call_llm()            # Main routing method with retry and fallback
+```
+
+### Scaling Architecture
+
+```
+Client (React) -> CDN (Vercel) -> API Gateway
+                                      |
+                              Load Balancer
+                                      |
+                  ______________________
+                 |                      |
+         FastAPI Cluster          Worker Cluster
+         (Hugging Face)      (Background Processing)
+                 |                      |
+         MongoDB Atlas           LLM Council
+         (Auto-scaling)         Master: Groq LLaMA
+                                Layer 1: MiniMax + Claude
+                                Layer 2: Gemini + Qwen
+                                Layer 3: GPT-5
+```
 
 ---
 
 ## Installation
 
 ### Prerequisites
-- Python 3.11+
-- Node.js 18+
+
+- Python 3.11 or higher
+- Node.js 18 or higher
 - MongoDB (local or cloud)
-- Google API Key (for Gemini)
-- Groq API Key (optional)
-- Firebase Project (for authentication)
+- Google API Key (Gemini)
+- Groq API Key (LLaMA)
+- OpenRouter API Key (MiniMax, Claude, Qwen, GPT-5)
+- Firebase Project (authentication)
 
 ### Backend Setup
 
-1. **Navigate to backend directory**
 ```bash
 cd backend
-```
-
-2. **Create virtual environment**
-```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies**
-```bash
+source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. **Configure environment variables**
-Create a `.env` file:
+Create a `.env` file in the backend directory:
+
 ```env
 # MongoDB
 MONGODB_URL=mongodb://localhost:27017
 DATABASE_NAME=fathom
 
 # LLM Configuration
-LLM_STRATEGY=hybrid  # Options: gemini, groq, hybrid
-GOOGLE_API_KEY=your_gemini_api_key_here
-GROQ_API_KEY=your_groq_api_key_here
+LLM_STRATEGY=hybrid
+GOOGLE_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key
+OPENROUTER_API_KEY=your_openrouter_api_key
 FALLBACK_TO_MOCK=true
 
-# JWT (if using custom auth)
-SECRET_KEY=your-secret-key-here
+# JWT
+SECRET_KEY=your-secret-key
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 # File Upload
 UPLOAD_DIR=./uploads
-MAX_UPLOAD_SIZE=524288000  # 500MB in bytes
+MAX_UPLOAD_SIZE=524288000
 
 # Scoring Weights - Core Metrics
 WEIGHT_CLARITY=0.25
@@ -501,27 +480,23 @@ WEIGHT_ADAPTABILITY=0.08
 WEIGHT_RELEVANCE=0.09
 ```
 
-5. **Run the server**
+Start the server:
+
 ```bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Frontend Setup
 
-1. **Navigate to frontend directory**
 ```bash
 cd frontend
-```
-
-2. **Install dependencies**
-```bash
 npm install
 ```
 
-3. **Configure environment variables**
-Create a `.env` file:
+Create a `.env` file in the frontend directory:
+
 ```env
-REACT_APP_API_URL=https://huggingface.co/spaces/ParthG2209/fathom
+REACT_APP_API_URL=https://parthg2209-fathom.hf.space
 
 # Firebase Configuration
 REACT_APP_FIREBASE_API_KEY=your_api_key
@@ -530,206 +505,49 @@ REACT_APP_FIREBASE_PROJECT_ID=your_project_id
 REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 REACT_APP_FIREBASE_APP_ID=your_app_id
+
+# EmailJS (OTP verification)
+REACT_APP_EMAILJS_SERVICE_ID=your_service_id
+REACT_APP_EMAILJS_TEMPLATE_ID=your_template_id
+REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
 ```
 
-4. **Start development server**
+Start the development server:
+
 ```bash
 npm start
 ```
 
-The application will open at `http://localhost:3000`
+The application will be available at `http://localhost:3000`.
+
+### Load Demo Data
+
+```bash
+cd backend
+python scripts/load_demo_data.py
+```
+
+This creates 5 sample mentors, 10 sample sessions, and complete evaluations with varying quality levels.
 
 ---
 
-## Quick Start Guide
-
-### 1. Sign Up / Login
-- Visit [https://fathom-murex.vercel.app/](https://fathom-murex.vercel.app/)
-- Sign up with email/password or Google OAuth
-- Access the dashboard
-
-### 2. Add a Mentor
-- Navigate to "Mentors" in the sidebar
-- Click "Add Mentor" button
-- Fill in mentor details (name, email, expertise, bio)
-- Click "Add Mentor"
-
-### 3. Upload Teaching Session
-- Click on a mentor or navigate to "Sessions"
-- Click "Upload Session" button
-- Fill in session details:
-  - Select mentor from dropdown
-  - Enter session title
-  - Enter topic (important for relevance validation)
-  - Upload video file (MP4, MOV, AVI, MKV - max 500MB)
-- Click "Upload"
-
-### 4. Start Evaluation
-- Session status will change to "Uploaded"
-- Click on the session to view details
-- Click "Start Evaluation" button
-- Wait for transcription and analysis (2-5 minutes)
-- Status will update automatically: Uploaded → Transcribing → Analyzing → Completed
-
-### 5. View Results
-- Once completed, view:
-  - Overall score and metric breakdown (10 dimensions)
-  - Explanation flow visualization (D3.js graph)
-  - Segment-by-segment scores
-  - Strengths and areas for improvement
-  - Detailed feedback for each metric
-  - Evidence extraction (problematic phrases)
-  - AI-generated rewrites with style improvements
-  - Coherence analysis (contradictions, drift, gaps)
-
----
-
-## API Documentation
-
-### Mentors
-
-**Create Mentor**
-```http
-POST /api/mentors
-Content-Type: application/json
-
-{
-  "name": "Dr. Sarah Chen",
-  "email": "sarah@example.com",
-  "expertise": ["Python", "Machine Learning"],
-  "bio": "PhD in Computer Science"
-}
-```
-
-**Get All Mentors**
-```http
-GET /api/mentors
-```
-
-**Get Mentor Stats**
-```http
-GET /api/mentors/{mentor_id}/stats
-```
-
-### Sessions
-
-**Upload Session**
-```http
-POST /api/sessions
-Content-Type: multipart/form-data
-
-mentor_id: string
-title: string
-topic: string
-video: file
-```
-
-**Get Sessions**
-```http
-GET /api/sessions?mentor_id={mentor_id}&status={status}
-```
-
-**Get Session Details**
-```http
-GET /api/sessions/{session_id}
-```
-
-### Evaluations
-
-**Start Evaluation**
-```http
-POST /api/evaluations/sessions/{session_id}/evaluate
-```
-
-**Get Evaluation**
-```http
-GET /api/evaluations/sessions/{session_id}
-```
-
-**Get Evaluation Summary**
-```http
-GET /api/evaluations/{evaluation_id}/summary
-```
-
-### Evidence Extraction
-
-**Extract Evidence**
-```http
-POST /api/evidence/extract/{evaluation_id}
-```
-
-**Get Evidence**
-```http
-GET /api/evidence/{evaluation_id}
-```
-
-**Get Evidence by Metric**
-```http
-GET /api/evidence/{evaluation_id}/metric/{metric_name}
-```
-
-### Explanation Rewrites
-
-**Generate Rewrites**
-```http
-POST /api/rewrites/session/{session_id}
-```
-
-**Get Rewrites**
-```http
-GET /api/rewrites/{session_id}
-```
-
-**Get Rewrite Comparison**
-```http
-GET /api/rewrites/{session_id}/comparison
-```
-
-### Coherence Analysis
-
-**Check Coherence**
-```http
-POST /api/coherence/check/{session_id}
-```
-
-**Get Coherence Report**
-```http
-GET /api/coherence/{session_id}
-```
-
-**Get Contradictions**
-```http
-GET /api/coherence/{session_id}/contradictions
-```
-
-**Get Logical Gaps**
-```http
-GET /api/coherence/{session_id}/gaps
-```
-
----
-
-## Configuration Options
+## Configuration
 
 ### Scoring Weights
 
-Customize evaluation weights in `backend/config.py`:
+Evaluation weights can be customized in `backend/config.py` or via environment variables.
 
-```python
-# Core Metrics (75% total weight)
-WEIGHT_CLARITY = 0.25        # 25%
-WEIGHT_STRUCTURE = 0.20      # 20%
-WEIGHT_CORRECTNESS = 0.25    # 25%
-WEIGHT_PACING = 0.15         # 15%
-WEIGHT_COMMUNICATION = 0.15  # 15%
+The total weight of core metrics should sum to 1.0, and the advanced metrics are applied as additional factors. The current weighting reflects standard pedagogical importance, with correctness and clarity carrying the highest individual weights.
 
-# Advanced Metrics (25% total weight)
-WEIGHT_ENGAGEMENT = 0.10     # 10%
-WEIGHT_EXAMPLES = 0.10       # 10%
-WEIGHT_QUESTIONING = 0.08    # 8%
-WEIGHT_ADAPTABILITY = 0.08   # 8%
-WEIGHT_RELEVANCE = 0.09      # 9%
-```
+### LLM Strategy
+
+The `LLM_STRATEGY` environment variable controls routing behavior:
+
+- `gemini`: Use only Google Gemini
+- `groq`: Use only Groq LLaMA
+- `hybrid`: Use the full council architecture with intelligent routing (recommended)
+
+Setting `FALLBACK_TO_MOCK=true` enables mock evaluations when all API keys are unavailable, useful for development and testing.
 
 ### File Upload Limits
 
@@ -738,445 +556,292 @@ MAX_UPLOAD_SIZE = 500 * 1024 * 1024  # 500MB
 UPLOAD_DIR = "./uploads"
 ```
 
-### LLM Settings
-
-```python
-# Use only Gemini
-LLM_STRATEGY = "gemini"
-
-# Use only Groq
-LLM_STRATEGY = "groq"
-
-# Use both with intelligent routing
-LLM_STRATEGY = "hybrid"
-
-# Enable mock fallback for testing
-FALLBACK_TO_MOCK = True
-```
+Supported video formats: MP4, MOV, AVI, MKV.
 
 ---
 
-## Roadmap
+## API Documentation
 
-### Phase 1: Core Features 
-- User authentication and profile management
-- Mentor CRUD operations
-- Video upload and session management
-- AI-powered transcription with Google Gemini
-- Multi-dimensional evaluation system (10 metrics)
-- Interactive dashboard with analytics
-- Deployment on Vercel and Hugging Face
+### Mentors
 
-### Phase 2: Advanced Analysis 
-- Evidence extraction with problematic phrase detection
-- Explanation rewriting with improvement suggestions
-- Coherence analysis (contradictions, topic drift, logical gaps)
-- Advanced analytics dashboard
-- Topic relevance validation
-
-### Phase 3: Enterprise Features (In Progress...)
-- 🚧 Real-time video streaming analysis
-- 🚧 Multi-language support (Spanish, French, German, Japanese)
-- 🚧 Team collaboration features
-- 🚧 Custom evaluation criteria configuration
-- 🚧 PDF report generation
-- 🚧 Integration with LMS platforms (Canvas, Moodle, Blackboard)
-
-### Phase 4: Scale & Integration (Planned)
-- Mobile application (iOS & Android)
-- API webhooks for external integrations
-- White-label solutions for institutions
-- Advanced ML models for predictive analytics
-- SSO integration (SAML, LDAP)
-- Institutional dashboard with multi-tenant support
-- Automated accreditation report generation
-- Live session evaluation (real-time feedback during teaching)
-
----
-
-## Demo Data
-
-Load sample data for testing:
-
-```bash
-cd backend
-python scripts/load_demo_data.py
+```http
+POST   /api/mentors                           Create mentor
+GET    /api/mentors                           List all mentors
+GET    /api/mentors/{mentor_id}               Get mentor by ID
+PUT    /api/mentors/{mentor_id}               Update mentor
+DELETE /api/mentors/{mentor_id}               Delete mentor
+GET    /api/mentors/{mentor_id}/stats         Get mentor statistics
+POST   /api/mentors/dedup                     Deduplicate mentor records
 ```
 
-This creates:
-- 5 sample mentors
-- 10 sample sessions with varying quality
-- Complete evaluations with scores
-- Evidence extraction examples
-- Rewrite suggestions
-- Coherence analysis reports
+### Sessions
 
----
-
-## Troubleshooting
-
-### Common Issues
-
-**MongoDB Connection Failed**
-```bash
-# Check if MongoDB is running
-mongod --version
-
-# Start MongoDB service
-sudo systemctl start mongod  # Linux
-brew services start mongodb-community  # macOS
+```http
+POST   /api/sessions                          Upload session (multipart/form-data)
+GET    /api/sessions                          List sessions (filter by mentor_id, status)
+GET    /api/sessions/{session_id}             Get session by ID
+PUT    /api/sessions/{session_id}             Update session
+DELETE /api/sessions/{session_id}             Delete session
 ```
 
-**LLM API Errors**
-- Verify API keys are correct in `.env`
-- Check rate limits on Google AI Studio / Groq
-- Enable FALLBACK_TO_MOCK for testing without API keys
-- Ensure LLM_STRATEGY is set correctly
+### Evaluations
 
-**Video Upload Fails**
-- Check file size (max 500MB)
-- Verify supported formats: MP4, MOV, AVI, MKV
-- Ensure UPLOAD_DIR exists and has write permissions
-- Check disk space availability
-
-**Frontend Build Errors**
-```bash
-# Clear cache and reinstall
-rm -rf node_modules package-lock.json
-npm install
-
-# Clear build cache
-rm -rf build
-npm run build
+```http
+POST   /api/evaluations/sessions/{id}/evaluate    Start evaluation
+GET    /api/evaluations/sessions/{id}              Get evaluation by session ID
+GET    /api/evaluations/{evaluation_id}            Get evaluation by ID
+GET    /api/evaluations/{evaluation_id}/summary    Get summary
+GET    /api/evaluations                            List all evaluations
 ```
 
-**CORS Issues**
-- Backend CORS is configured for:
-  - `http://localhost:3000`
-  - `https://fathom-murex.vercel.app/`
-  - `https://*.vercel.app`
-  - Update `main.py` if deploying to different domain
+### Evidence
 
-**Firebase Authentication Errors**
-- Verify Firebase configuration in `.env`
-- Check Firebase Console for API key restrictions
-- Ensure authorized domains include your deployment URL
-
-**Evaluation Processing Timeout**
-- Large videos may take 5-10 minutes
-- Check backend logs for LLM API errors
-- Verify MongoDB connection is stable
-- Consider increasing timeout limits for long videos
-
----
-
-## Contributing
-
-We welcome contributions! Here's how to get started:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow PEP 8 for Python code
-- Use ESLint/Prettier for JavaScript/React code
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation as needed
-- Ensure all CI/CD checks pass
-
-### Code Review Process
-- All PRs require at least one review
-- Address review comments promptly
-- Squash commits before merging
-- Update CHANGELOG.md with your changes
-
----
-
-## Testing
-
-### Backend Tests
-```bash
-cd backend
-pytest tests/ -v
-pytest tests/ --cov=. --cov-report=html
+```http
+POST   /api/evidence/extract/{evaluation_id}           Extract evidence (background)
+GET    /api/evidence/{evaluation_id}                   Get all evidence
+GET    /api/evidence/{evaluation_id}/segment/{seg_id}  Get segment evidence
+GET    /api/evidence/{evaluation_id}/metric/{metric}   Get metric evidence
 ```
 
-### Frontend Tests
-```bash
-cd frontend
-npm test
-npm run test:coverage
+### Rewrites
+
+```http
+POST   /api/rewrites/session/{session_id}     Generate rewrites for session (background)
+POST   /api/rewrites/segment/{segment_id}     Rewrite single segment
+GET    /api/rewrites/{session_id}             Get all rewrites
+GET    /api/rewrites/{session_id}/comparison  Get side-by-side comparison
 ```
 
-### Manual Testing Checklist
-- [ ] User authentication (email + Google OAuth)
-- [ ] Mentor CRUD operations
-- [ ] Video upload (all supported formats)
-- [ ] Session evaluation pipeline
-- [ ] All 10 evaluation metrics
-- [ ] Evidence extraction
-- [ ] Rewrite generation
-- [ ] Coherence analysis
-- [ ] Dashboard visualizations
-- [ ] Responsive design (mobile/tablet/desktop)
+### Coherence
 
----
+```http
+POST   /api/coherence/check/{session_id}       Run coherence check (background)
+GET    /api/coherence/{session_id}             Get coherence report
+GET    /api/coherence/{session_id}/contradictions  Get contradictions only
+GET    /api/coherence/{session_id}/gaps            Get logical gaps only
+```
 
-## Performance Benchmarks
+### Access Codes
 
-### Backend Performance
-| Metric | Value |
-|--------|-------|
-| API Response Time (avg) | < 200ms |
-| Video Transcription | ~1-2 min per 30 min video |
-| Evaluation Processing | ~30-60 sec per session |
-| Concurrent Evaluations | 100+ simultaneous |
-| Database Query Time | < 50ms (with indexes) |
-
-### Frontend Performance
-| Metric | Value |
-|--------|-------|
-| First Contentful Paint | < 1.5s |
-| Time to Interactive | < 3.5s |
-| Lighthouse Score | 95+ |
-| Bundle Size | < 500KB (gzipped) |
-
+```http
+POST   /api/access-codes                      Create access code
+POST   /api/access-codes/verify               Verify access code
+GET    /api/access-codes                      List all codes
+PATCH  /api/access-codes/{code_id}/deactivate Revoke code
+DELETE /api/access-codes/{code_id}            Delete code
+```
 
 ---
 
 ## Deployment
 
-### Docker Deployment
+### Docker (Backend)
 
-**Backend**
 ```bash
 cd backend
 docker build -t fathom-backend .
 docker run -p 8000:8000 --env-file .env fathom-backend
 ```
 
-**Docker Compose (Full Stack)**
-```bash
-docker-compose up -d
-```
-
 ### Hugging Face Spaces (Backend)
-1. Create new Space on Hugging Face
-2. Connect GitHub repository
-3. Set environment variables in Space settings
-4. Auto-deploys on push to main branch
+
+1. Create a new Space on Hugging Face
+2. Connect your GitHub repository
+3. Set all environment variables in the Space settings
+4. The application auto-deploys on push to the main branch
+
+The application runs on port 7860 in Hugging Face Spaces (configured in `main.py`).
 
 ### Vercel (Frontend)
-1. Connect GitHub repository to Vercel
-2. Configure build settings:
-   - Build Command: `npm run build`
-   - Output Directory: `build`
-3. Set environment variables
-4. Auto-deploys on push to main branch
 
-### Manual Deployment
+1. Connect your GitHub repository to Vercel
+2. Set build command: `npm run build`
+3. Set output directory: `build`
+4. Add all environment variables
+5. The application auto-deploys on push to the main branch
+
+The `vercel.json` configuration handles SPA routing and sets the required `Cross-Origin-Opener-Policy` header for Firebase Google OAuth to function correctly.
+
+### Production Backend
+
 ```bash
-# Backend
 cd backend
 gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-
-# Frontend
-cd frontend
-npm run build
-# Serve build/ directory with nginx or similar
 ```
 
 ---
 
-## Use Cases
+## Performance Benchmarks
 
-### 1. University-Wide Teaching Quality Assessment
-**Scenario**: Stanford University evaluates 500+ teaching assistants across multiple departments
-- Upload lecture recordings after each class
-- Track TA performance over the semester
-- Identify struggling TAs early for intervention
-- Generate departmental reports for faculty review
-- Compare teaching quality across sections
+### Backend
 
-### 2. Corporate Training Certification
-**Scenario**: Global tech company certifies 200+ internal trainers
-- Standardized evaluation criteria for all trainers
-- Automated feedback reduces manual review time by 80%
-- Objective scoring for certification decisions
-- Continuous improvement tracking
-- Compliance documentation for HR
+| Metric | Target |
+|--------|--------|
+| API Response Time (average) | less than 200ms |
+| Video Transcription | approximately 1-2 minutes per 30-minute video |
+| Evaluation Processing | 30-60 seconds per session |
+| Concurrent Evaluations | 100+ simultaneous |
+| Database Query Time | less than 50ms with indexes |
 
-### 3. Medical Education Quality Control
-**Scenario**: Medical school ensures clinical teaching standards
-- Evaluate patient interaction simulations
-- Assess communication skills in sensitive scenarios
-- Monitor consistency across multiple instructors
-- Identify best practices for replication
-- Accreditation compliance reporting
+### Frontend
 
-### 4. Online Course Quality Assurance
-**Scenario**: MOOC platform maintains content quality across 1000+ courses
-- Automated screening of new course submissions
-- Continuous monitoring of existing courses
-- Instructor feedback for content improvement
-- Student experience correlation analysis
-- Platform-wide quality metrics
+| Metric | Target |
+|--------|--------|
+| First Contentful Paint | less than 1.5s |
+| Time to Interactive | less than 3.5s |
+| Lighthouse Score | 95+ |
+| Bundle Size (gzipped) | less than 500KB |
+
+---
+
+## Roadmap
+
+### Completed
+
+- Firebase authentication with OTP email verification
+- Mentor CRUD operations with role-based scoping
+- Video upload and session management
+- AI-powered transcription with Google Gemini
+- Four-layer LLM council evaluation system
+- Ten-dimensional scoring with weighted metrics
+- Interactive dashboard with analytics
+- Evidence extraction and explanation rewriting
+- Coherence analysis (contradictions, topic drift, logical gaps)
+- PDF report generation for individual faculty and institutional analytics
+- Access code management for institution faculty
+- Admin tools for database deduplication
+- Dark and light mode theming
+
+### In Progress
+
+- Real-time video streaming analysis
+- Multi-language support
+- Team collaboration features
+- Custom evaluation criteria configuration
+- Integration with LMS platforms (Canvas, Moodle, Blackboard)
+
+### Planned
+
+- Mobile application (iOS and Android)
+- API webhooks for external integrations
+- White-label solutions for institutions
+- Advanced ML models for predictive analytics
+- SSO integration (SAML, LDAP)
+- Automated accreditation report generation
+- Live session evaluation with real-time feedback during teaching
+
+---
+
+## Troubleshooting
+
+**MongoDB Connection Failed**
+Verify MongoDB is running and the `MONGODB_URL` in your `.env` file is correct.
+
+**LLM API Errors**
+Verify API keys are set correctly without leading or trailing whitespace. Check rate limits on Google AI Studio, Groq, and OpenRouter. Enable `FALLBACK_TO_MOCK=true` for testing without API keys.
+
+**Video Upload Fails**
+Check file size (maximum 500MB) and that the format is one of MP4, MOV, AVI, or MKV. Verify the uploads directory exists and has write permissions.
+
+**Frontend Build Errors**
+Clear the cache and reinstall dependencies: `rm -rf node_modules package-lock.json && npm install`.
+
+**CORS Issues**
+The backend CORS configuration allows `http://localhost:3000`, `https://fathom-murex.vercel.app/`, and `https://*.vercel.app`. Update `main.py` if deploying to a different domain.
+
+**Evaluation Processing Timeout**
+Large videos may take 5-10 minutes. Check backend logs for LLM API errors and verify the MongoDB connection is stable.
+
+---
+
+## Testing
+
+### Backend Tests
+
+```bash
+cd backend
+pytest tests/ -v
+pytest tests/ --cov=. --cov-report=html
+```
+
+### Feature Tests
+
+```bash
+cd backend
+python scripts/test_new_features.py
+```
+
+This script tests the LLM client, evidence extraction, explanation rewriting, coherence checking, and the full analysis pipeline.
+
+### Manual Testing Checklist
+
+- User authentication (email and Google OAuth)
+- OTP email verification on sign-up
+- Mentor CRUD operations
+- Video upload (all supported formats)
+- Session evaluation pipeline end-to-end
+- All ten evaluation metrics present in results
+- Evidence extraction
+- Rewrite generation
+- Coherence analysis
+- PDF report download for both faculty and institutional views
+- Access code generation and verification
+- Responsive design on mobile, tablet, and desktop
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes: `git commit -m 'Add your feature description'`
+4. Push to the branch: `git push origin feature/your-feature-name`
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow PEP 8 for Python code
+- Use ESLint and Prettier for JavaScript and React code
+- Write meaningful commit messages
+- Add tests for new features
+- Update this documentation as needed
+- Ensure all CI/CD checks pass before requesting review
+
+All pull requests require at least one review. Squash commits before merging and update the changelog with your changes.
+
+---
+
+## Security and Privacy
+
+**Data Protection:** All data is encrypted at rest (MongoDB) and in transit (HTTPS/TLS 1.3). Firebase Auth supports MFA. Role-based access control is enforced at both the API and frontend routing levels.
+
+**Access Codes:** Institution access codes are hashed client-side using SHA-256 before being sent to the server. The seed phrase never leaves the browser. Once a faculty member logs in with a code, it binds permanently to their Firebase UID and cannot be reused.
+
+**API Security:** Rate limiting is applied to prevent abuse. Input validation and sanitization are enforced at the Pydantic model layer on all incoming requests.
 
 ---
 
 ## Impact Metrics
 
-### Efficiency Gains
-- **80% reduction** in manual evaluation time
-- **95% consistency** in scoring across evaluators
-- **3x faster** feedback delivery to instructors
-- **60% cost savings** vs traditional observation methods
+**Efficiency Gains:**
+- 80% reduction in manual evaluation time
+- 95% consistency in scoring across evaluators
+- 3x faster feedback delivery to instructors
+- 60% cost savings compared to traditional observation methods
 
-### Quality Improvements
-- **25% average improvement** in teaching scores after feedback
-- **40% reduction** in student complaints about teaching
-- **2x increase** in instructor engagement with professional development
-- **90% instructor satisfaction** with feedback quality
-
-### Institutional Benefits
-- Standardized evaluation across 100+ departments
-- Data-driven faculty development programs
-- Objective evidence for promotion decisions
-- Accreditation compliance documentation
-- Continuous quality improvement culture
-
----
-
-## Security & Privacy
-
-### Data Protection
-- **Encryption**: All data encrypted at rest (MongoDB) and in transit (HTTPS/TLS 1.3)
-- **Authentication**: Firebase Auth with MFA support
-- **Authorization**: Role-based access control (RBAC)
-- **Data Retention**: Configurable retention policies per institution
-- **GDPR Compliance**: Right to access, modify, and delete data
-
-### Video Storage
-- Videos stored in secure cloud storage (AWS S3/Google Cloud Storage)
-- Pre-signed URLs for time-limited access
-- Automatic deletion after processing (configurable)
-- Access logs for audit trails
-
-### API Security
-- Rate limiting to prevent abuse
-- API key authentication for programmatic access
-- Input validation and sanitization
-- SQL injection and XSS protection
-- Regular security audits
-
----
-
-## Documentation
-
-### For Developers
-- [API Reference](https://huggingface.co/spaces/ParthG2209/fathom/docs)
-- [Contributing Guide](CONTRIBUTING.md)
-- [Code Architecture](docs/architecture.md)
-- [Development Setup](docs/setup.md)
-
-### For Users
-- [User Manual](docs/user-manual.md)
-- [Video Tutorials](https://youtube.com/playlist/fathom-tutorials)
-- [FAQ](docs/faq.md)
-- [Best Practices](docs/best-practices.md)
-
-### For Administrators
-- [Deployment Guide](docs/deployment.md)
-- [Configuration Options](docs/configuration.md)
-- [Monitoring & Logging](docs/monitoring.md)
-- [Backup & Recovery](docs/backup.md)
-
----
-
-## Acknowledgments
-
-### Open Source Libraries
-- **LLM Providers**: Google Gemini, Groq
-- **UI Components**: shadcn/ui, Radix UI
-- **Charts**: Recharts, D3.js
-- **Authentication**: Firebase
-- **Deployment**: Vercel, Hugging Face Spaces
-- **Icons**: Lucide React
-- **Animations**: Framer Motion
-- **3D Graphics**: Three.js
-
-### Research & Inspiration
-- Teaching evaluation frameworks from MIT, Stanford, and Carnegie Mellon
-- Educational psychology research on effective feedback
-- NLP research on explainable AI
-- Open-source contributions from the developer community
-
----
-
-## Contact & Support
-
-### Project Information
-- **Developer**: Parth Gupta
-- **LinkedIn**: [linkedin.com/in/parth-gupta-4598b8324/](https://www.linkedin.com/in/parth-gupta-4598b8324/)
-- **GitHub**: [github.com/ParthG2209/fathom](https://github.com/ParthG2209/fathom)
-- **Email**: guptaparth2209@gmail.com
-
-### Support Channels
-- **Issues**: [GitHub Issues](https://github.com/ParthG2209/fathom/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ParthG2209/fathom/discussions)
-- **Email Support**: support@fathom.ai (for enterprise customers)
-
-### Enterprise Inquiries
-For institutional deployments, custom features, or consulting services:
-- Email: enterprise@fathom.ai
-- Schedule a demo: [calendly.com/fathom](https://calendly.com/fathom)
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-
-
----
-
-## Project Status
-
-![GitHub last commit](https://img.shields.io/github/last-commit/ParthG2209/fathom)
-![GitHub issues](https://img.shields.io/github/issues/ParthG2209/fathom)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/ParthG2209/fathom)
-![GitHub stars](https://img.shields.io/github/stars/ParthG2209/fathom?style=social)
-![GitHub forks](https://img.shields.io/github/forks/ParthG2209/fathom?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/ParthG2209/fathom?style=social)
-
-**Current Version**: 2.0.0  
-**Last Updated**: December 2025  
-**Status**: Active Development  
-**Stability**: Beta (Production-Ready)
-
----
-
-## Star History
-
-If you find fathom useful, please consider starring the repository! It helps us understand what features the community values most and motivates continued development.
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ParthG2209/fathom&type=Date)](https://star-history.com/#ParthG2209/fathom&Date)
+**Quality Improvements:**
+- 25% average improvement in teaching scores after feedback
+- 40% reduction in student complaints about teaching clarity
+- 90% instructor satisfaction with feedback quality
 
 ---
 
 ## Academic Citation
 
-If you use fathom in your research or academic work, please cite:
-
 ```bibtex
 @software{fathom2025,
-  author = {Gupta, Parth},
-  title = {fathom: AI-Powered Mentor Evaluation System},
+  author = {Gupta, Parth and Siddiqui, Azhaan Ali and Prasad, Shiv Narayan and Yugal, Chetan and Bhargava, Shresth},
+  title = {Fathom: AI-Powered Mentor Evaluation System with Multi-Layer LLM Council Architecture},
   year = {2025},
   publisher = {GitHub},
   journal = {GitHub repository},
@@ -1187,23 +852,22 @@ If you use fathom in your research or academic work, please cite:
 
 ---
 
-## Future Vision
+## Contact and Support
 
-fathom aims to revolutionize teaching evaluation by:
-1. **Democratizing Quality Education**: Making expert-level evaluation accessible to all institutions
-2. **Evidence-Based Improvement**: Providing actionable, data-driven feedback for instructors
-3. **Scaling Excellence**: Enabling quality education at scale through AI-powered insights
-4. **Continuous Innovation**: Staying at the forefront of educational AI research
-5. **Global Impact**: Supporting educators worldwide in improving teaching effectiveness
+**Developer:** Parth Gupta  
+**LinkedIn:** [linkedin.com/in/parth-gupta-4598b8324](https://www.linkedin.com/in/parth-gupta-4598b8324/)  
+**GitHub:** [github.com/ParthG2209/fathom](https://github.com/ParthG2209/fathom)  
+**Email:** guptaparth2209@gmail.com
 
-Join us in transforming education, one evaluation at a time! 
+**Issues:** [GitHub Issues](https://github.com/ParthG2209/fathom/issues)  
+**Discussions:** [GitHub Discussions](https://github.com/ParthG2209/fathom/discussions)
 
 ---
 
-<div align="center">
+**Current Version:** 2.0.0  
+**Last Updated:** December 2025  
+**Status:** Active Development - Beta (Production-Ready)
 
-[Website](https://fathom-murex.vercel.app/) • [API](https://huggingface.co/spaces/ParthG2209/fathom) • [Support](mailto:guptaparth2209@gmail.com)
+---
 
-Copyright © 2025 fathom. All rights reserved.
-
-</div>
+Copyright 2025 Fathom. All rights reserved.
