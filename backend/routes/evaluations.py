@@ -10,7 +10,7 @@ from models.session import SessionStatus
 from db import get_db
 from services.transcription import transcription_service
 from services.segmentation import segmentation_service
-from services.llm_evaluator import llm_evaluator
+from services.council_evaluator import council_evaluator
 from services.scoring import scoring_service
 from config import settings
 
@@ -21,7 +21,7 @@ async def evaluate_single_segment(seg, topic, title, semaphore, index, total):
     async with semaphore:
         print(f"Evaluating segment {index+1}/{total}")
         try:
-            eval_scores = await llm_evaluator.evaluate_segment(
+            eval_scores = await council_evaluator.evaluate_segment(
                 seg.text,
                 topic,
                 title
