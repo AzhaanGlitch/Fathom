@@ -15,7 +15,7 @@ import {
 } from 'recharts';
 import { mentorApi, sessionApi, evaluationApi } from '../../api/client';
 import { auth } from '../../lib/firebase';
-import { downloadElementAsPDF } from '../../lib/reportGenerator';
+import { generateFacultyReport, generateInstitutionalReport } from '../../lib/reportGenerator';
 
 const DashboardHome = () => {
   const navigate = useNavigate();
@@ -141,9 +141,19 @@ const DashboardHome = () => {
   const handleDownloadReport = async () => {
     try {
       setDownloadingReport(true);
-      const element = document.getElementById('dashboard-report-content');
-      const filename = isAdmin ? 'institutional_dashboard_report.pdf' : `${myMentor?.name?.replace(/\s+/g, '_') || 'faculty'}_dashboard_report.pdf`;
-      await downloadElementAsPDF(element, filename);
+      if (isAdmin) {
+        await generateInstitutionalReport({
+          stats: { totalMentors: stats.totalMentors, totalSessions: stats.totalSessions, averageScore: stats.averageScore, completionRate: stats.totalSessions ? (stats.completedSessions / stats.totalSessions) * 100 : 0 },
+          sessionsByStatus: activeUsersData.map(d => ({ name: d.category, value: d.value, color: d.color })),
+        });
+      } else {
+        await generateFacultyReport({
+          mentor: myMentor,
+          stats,
+          sessionBreakdown: activeUsersData,
+          recentSessions,
+        });
+      }
     } catch (err) {
       console.error('Failed to download report', err);
       alert('Failed to generate report. Please try again.');
