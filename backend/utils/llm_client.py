@@ -27,6 +27,7 @@ class UnifiedLLMClient:
         # ✅ CRITICAL FIX: Strip keys to remove hidden newlines/spaces that break requests
         self.gemini_api_key = settings.GOOGLE_API_KEY.strip() if settings.GOOGLE_API_KEY else ""
         self.groq_api_key = settings.GROQ_API_KEY.strip() if settings.GROQ_API_KEY else ""
+        self.openrouter_api_key = settings.OPENROUTER_API_KEY.strip() if settings.OPENROUTER_API_KEY else ""
         self.use_mock_fallback = settings.FALLBACK_TO_MOCK
         
         # Task routing configuration
@@ -228,6 +229,66 @@ class UnifiedLLMClient:
             
         except (KeyError, IndexError, json.JSONDecodeError) as e:
             raise LLMClientError(f"Failed to parse Groq response: {e}")
+
+    async def _call_openrouter(
+        self, 
+        prompt: str, 
+        model: str,
+        response_format: str,
+        temperature: float
+    ) -> Dict[str, Any]:
+        """Call OpenRouter API to access models like claude, gpt-4, minimax, qwen"""
+        url = "https://openrouter.ai/api/v1/chat/completions"
+        
+        headers = {
+            "Authorization": f"Bearer {self.openrouter_api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://fathom.internal",
+            "X-Title": "Fathom"
+        }
+        
+        messages = [
+            {"role": "system", "content": "You are an expert evaluator/assistant. Try to Output valid JSON if requested however sometimes models fail at JSON. If you output markdown JSON, we will clean it up."},
+            {"role": "user", "content": prompt}
+        ]
+        
+        payload = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": 2048,
+        }
+        
+        if response_format == 'json' and 'gpt' in model.lower():
+            payload["response_format"] = {"type": "json_object"}
+            
+        async with httpx.AsyncClient(timeout=90.0) as client:
+            response = await client.post(url, headers=headers, json=payload)
+            
+        if response.status_code == 429:
+            raise RateLimitError("OpenRouter rate limit exceeded")
+            
+        if response.status_code != 200:
+            raise LLMClientError(f"OpenRouter API error: {response.status_code} - {response.text}")
+            
+        data = response.json()
+        
+        try:
+            content = data['choices'][0]['message']['content']
+            
+            if response_format == 'json':
+                content = self._clean_json_string(content)
+                try:
+                    return json.loads(content)
+                except json.JSONDecodeError as je:
+                    json_match = re.search(r'\{.*\}', content, re.DOTALL)
+                    if json_match:
+                        return json.loads(json_match.group())
+                    raise LLMClientError(f"Failed to parse JSON: {je}\nContent: {content[:200]}")
+            return {'text': content}
+            
+        except (KeyError, IndexError) as e:
+            raise LLMClientError(f"Failed to parse OpenRouter response: {e}")
 
     def _clean_json_string(self, content: str) -> str:
         """Helper to remove markdown code blocks from JSON strings"""
