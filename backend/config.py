@@ -21,6 +21,9 @@ class Settings:
     
     # Fallback Configuration
     FALLBACK_TO_MOCK = os.getenv("FALLBACK_TO_MOCK", "true").lower() == "true"
+    
+    # OpenRouter
+    OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
     # ===== END NEW =====
     
     # API Keys (Optional)
