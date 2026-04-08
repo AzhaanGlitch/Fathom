@@ -96,7 +96,7 @@ The same peer-review process applies. Both models produce evaluations independen
 **Trigger:** Softer academic subjects, language instruction, social sciences, and general knowledge topics where deep technical reasoning is not required.
 
 **Model Used:**
-- OpenAI GPT-5 (via OpenRouter)
+- OpenAI GPT-4o (via OpenRouter)
 
 This layer uses a single high-capability general-purpose model suited to humanistic and conversational content.
 
@@ -124,7 +124,7 @@ Master LLM (LLaMA 3.3 70B)
 Layer 1    Layer 2          Layer 3
 (Heavy     (Deep            (General)
 Technical) Research)
-MiniMax +  Gemini +         GPT-5
+MiniMax +  Gemini +         GPT-4o
 Claude     Qwen
   |           |                |
   v           v                v
@@ -274,7 +274,7 @@ Advanced Metrics (25% weight):
 | Database | MongoDB Atlas with Motor 3.6.0 async driver |
 | Primary LLM | Google Gemini 2.5 Flash |
 | Orchestrator LLM | Groq LLaMA 3.3 70B |
-| Specialist LLMs | MiniMax-01, Claude Sonnet 4.6, Qwen 2.5 72B, GPT-5 via OpenRouter |
+| Specialist LLMs | MiniMax-01, Claude Sonnet 4.6, Qwen 2.5 72B, GPT-4o via OpenRouter |
 | Video Transcription | Google Gemini |
 | Authentication | Firebase Auth |
 | Validation | Pydantic v2.5.0 |
@@ -396,7 +396,7 @@ The `UnifiedLLMClient` in `backend/utils/llm_client.py` provides a single interf
 UnifiedLLMClient
 ├── _call_gemini()        # Google Gemini API
 ├── _call_groq()          # Groq API (LLaMA 3.3 70B)
-├── _call_openrouter()    # OpenRouter (MiniMax, Claude, Qwen, GPT-5)
+├── _call_openrouter()    # OpenRouter (MiniMax, Claude, Qwen, GPT-4o)
 └── call_llm()            # Main routing method with retry and fallback
 ```
 
@@ -416,7 +416,7 @@ Client (React) -> CDN (Vercel) -> API Gateway
          (Auto-scaling)         Master: Groq LLaMA
                                 Layer 1: MiniMax + Claude
                                 Layer 2: Gemini + Qwen
-                                Layer 3: GPT-5
+                                Layer 3: GPT-4o
 ```
 
 ---
@@ -430,7 +430,7 @@ Client (React) -> CDN (Vercel) -> API Gateway
 - MongoDB (local or cloud)
 - Google API Key (Gemini)
 - Groq API Key (LLaMA)
-- OpenRouter API Key (MiniMax, Claude, Qwen, GPT-5)
+- OpenRouter API Key (MiniMax, Claude, Qwen, GPT-4o)
 - Firebase Project (authentication)
 
 ### Backend Setup
