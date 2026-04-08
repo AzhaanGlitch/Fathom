@@ -49,7 +49,7 @@ Return ONLY a JSON object with a single key "category" whose value is one of "pr
         if category == 'programming':
             models = [
                 {'provider': 'openrouter', 'model': 'minimax/minimax-01'},
-                {'provider': 'openrouter', 'model': 'anthropic/claude-3.5-sonnet'}
+                {'provider': 'openrouter', 'model': 'anthropic/claude-4.5-sonnet'}
             ]
         elif category == 'deep_research':
             models = [
