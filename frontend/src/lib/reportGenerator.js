@@ -3,7 +3,7 @@
 // Uses jsPDF native vector drawing + Canvas chart images
 // ============================================================
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 // ── DESIGN SYSTEM ───────────────────────────────────────────
 const C = {
@@ -396,7 +396,7 @@ export async function generateFacultyReport({ mentor, stats, sessionBreakdown, r
   ]);
 
   if (tableData.length > 0) {
-    doc.autoTable({
+    autoTable(doc, {
       startY: y,
       head: [['Session Title','Topic','Status','Date','Duration']],
       body: tableData,
